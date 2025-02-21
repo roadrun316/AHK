@@ -29,7 +29,7 @@ AppsKey & Numpad1::
 AppsKey & Numpad2::
 	MODEL_NAME := 28
 	APK_NAME = EM_ScreenService
-	COMMENT = Power off 버튼 눌림효과. Power off 진입 애니메이션 중 버튼 클릭 비활성화
+	COMMENT = KGM LINK 적용
 
 	return
 
@@ -72,14 +72,14 @@ AppsKey & Numpad7::
 AppsKey & Numpad8::
 	MODEL_NAME := 18
 	APK_NAME = EM_CCU
-	COMMENT = All menu 화면 "차량설정" 눌림표시 지속됨 (타앱 선택/해제 해도 유지) https://digen.atlassian.net/browse/KGMO100-187
+	COMMENT = KGM LINK 적용
 	return
 
 ; Launcher
 AppsKey & Numpad9::
 	MODEL_NAME := 1
 	APK_NAME = EM_Launcher
-	COMMENT = All menu 화면 "차량설정" 눌림표시 지속됨 (타앱 선택/해제 해도 유지) https://digen.atlassian.net/browse/KGMO100-187
+	COMMENT = KGM LINK 적용
 	return
 
 AppsKey & Numpad0::
