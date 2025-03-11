@@ -3,14 +3,15 @@ CoordMode, Mouse, Client
 
 global COMMENT = 테스트입니다
 global VERSION
-global MODEL_NAME := 1
+global MODEL_INDEX := 1
 global APK_NAME = EM_Launcher
 global ManifestCount := 4
 global APK_MODEL := ""
+global PROJECT_NAME := ""
 
 global FOLDER_PATH = "R:\U100_Release\"
 
-FormatTime, VERSION, %A_Now%, 3.MM.dd.1
+FormatTime, VERSION, %A_Now%, 3.MM.dd
 FormatTime, Today,, yyyy_MMdd   ; 오늘 날짜를 YYYY-MM-DD 형식으로 가져오기
 FOLDER_PATH := "R:\U100_Release\" . Today  ; 폴더 경로 지정
 
@@ -18,78 +19,78 @@ if (!FileExist(FOLDER_PATH)) {    ; 폴더가 존재하지 않으면
 	FileCreateDir, %FOLDER_PATH%  ; 폴더 생성
 }
 
+
 ; DataService
 AppsKey & Numpad1::
-	MODEL_NAME := 31
+	MODEL_INDEX := 31
 	APK_NAME = EM_DataService
-	COMMENT = SA부팅시 KGM 로고 크기 처리 오류 수정
+	COMMENT = 최신소스 빌드 J120 적용
 	return
 
 ; ScreenService
 AppsKey & Numpad2::
-	MODEL_NAME := 28
+	MODEL_INDEX := 28
 	APK_NAME = EM_ScreenService
-	COMMENT = KGM LINK 적용
+	COMMENT = Variant 처리 오류로 재업로드
 
 	return
 
 ; MicomService
 AppsKey & Numpad3::
-	MODEL_NAME := 34
+	MODEL_INDEX := 34
 	APK_NAME = EM_MicomService
-	COMMENT = 상단바 Timeout 기본값: 고정 -> 10초로 수정
+	COMMENT = 최신소스 빌드 J120 적용
 	return
 
 ; SystemService
 AppsKey & Numpad4::
-	MODEL_NAME := 35
+	MODEL_INDEX := 35
 	APK_NAME = EM_SystemService
-	COMMENT = 터널 진입 OSD 안뜨는 문제 수정
+	COMMENT = Variant 처리 오류로 재업로드
 	return
 
 ; AudioService
 AppsKey & Numpad5::
-	MODEL_NAME := 0
+	MODEL_INDEX := 0
 	APK_NAME = EM_AudioService
 	COMMENT = AudioPath 6인경우 Path 1로 처리 (AA No Ducking 모드인경우. 6으로 처리시 라디오 소리 들림)
 	return
 
 ; ClusterService
 AppsKey & Numpad6::
-	MODEL_NAME := 5
+	MODEL_INDEX := 5
 	APK_NAME = EM_ClusterService
-	COMMENT = ArrayList remove시 ConcurrentModificationException 오류 수정
+	COMMENT = Variant 처리 오류로 재업로드
 	return
 
 ; WatcherService
 AppsKey & Numpad7::
-	MODEL_NAME := 32
+	MODEL_INDEX := 32
 	APK_NAME = EM_WatcherService
-	COMMENT = Memory Check 수정 (DB에러 개선)
+	COMMENT = MemoryUsageDB 재부팅시에도 유지되게 수정. CPU usage 정보 추가.
 	return
 
 ; CCU
 AppsKey & Numpad8::
-	MODEL_NAME := 18
+	MODEL_INDEX := 18
 	APK_NAME = EM_CCU
 	COMMENT = KGM LINK 적용
 	return
 
 ; Launcher
 AppsKey & Numpad9::
-	MODEL_NAME := 1
+	MODEL_INDEX := 1
 	APK_NAME = EM_Launcher
-	COMMENT = KGM LINK 적용
+	COMMENT = Variant 처리 오류로 재업로드
 	return
 
 AppsKey & Numpad0::
-	APK_MODEL = _J120.APK
 	InputParameter()
 	return
 
 AppsKey & NumpadDot::
-	APK_MODEL = .APK
-	InputParameter()
+	;~ InputParameter()
+	CheckProjectName()
 	return
 
 
@@ -100,17 +101,13 @@ return
 InputParameter()
 {
 	; PROJECT NAME
-	;~ Click, Left, 600, 460
-	; J120_HQX
-	;~ Click, Left, 600, %y%
-	;~ Click, Left, 600, 661
-	;~ Click, Left, 600, 693
-	;~ Sleep, 500
+	CheckProjectName()
+
 	; MODEL NAME
 	ClickModelName()
 	Sleep, 200
 	; Launcher
-	Send, {Down %MODEL_NAME%}
+	Send, {Down %MODEL_INDEX%}
 	Send, {Enter}
 
 	ClickApkVersion()
@@ -118,8 +115,9 @@ InputParameter()
 	SendInput ^v
 	Send, %VERSION%
 
-	if (APK_MODEL == "_J120.APK")
+	;~ if (APK_MODEL == "_J120.APK")
 		ClickCheckBox()
+
 
 	ClickFile()
 	Sleep, 2000
@@ -147,6 +145,61 @@ InputParameter()
 
 global SearchX := 0
 global SearchY := 0
+
+CheckProjectName()
+{
+	RunWait, python E:\GitHub\Python\Jenkins\getProjectName.py, ,Hide
+	projectlName := Clipboard
+
+  if (InStr(projectlName, "u100_h"))
+  {
+	PROJECT_NAME = "U100"
+	APK_MODEL = .APK
+  }
+  else if (InStr(projectlName, "j110"))
+  {
+	PROJECT_NAME = "J110"
+	APK_MODEL = .APK
+  }
+  else if (InStr(projectlName, "116_h"))
+  {
+	PROJECT_NAME = "J116"
+	APK_MODEL = .APK
+  }
+  else if (InStr(projectlName, "j120"))
+  {
+    PROJECT_NAME = "J120"
+	APK_MODEL = _J120_old.APK
+  }
+  else if (InStr(projectlName, "j140"))
+  {
+    PROJECT_NAME = "J140"
+	APK_MODEL = _J120.APK
+  }
+  else if (InStr(projectlName, "O100") || InStr(projectlName, "0100"))
+  {
+    PROJECT_NAME = "O100"
+	APK_MODEL = _J120.APK
+  }
+  else if (InStr(projectlName, "U105"))
+  {
+    PROJECT_NAME = "U105"
+	APK_MODEL = _J120.APK
+  }
+  else if (InStr(projectlName, "j116_25my"))
+  {
+    PROJECT_NAME = "J116_25MY"
+	APK_MODEL = _J120.APK
+  }
+  else
+  {
+    MsgBox ERROR: %projectlName%
+    ExitApp
+  }
+
+    ;~ MsgBox %projectlName% %PROJECT_NAME%
+
+}
 
 ClickCheckBox()
 {
@@ -244,7 +297,8 @@ ClickApkVersion()
 	;~ MsgBox, SpendTime: %SpendTime% msec
 
 	if (ErrorLevel = 1) {
-        return
+        MsgBox Error ClickApkVersion
+		exit
 	}
 
 	CenterX := FoundX + 50
@@ -258,10 +312,11 @@ ClickFile()
 {
 	ModelImage := "file.png"
 	;~ ImageSearch, FoundX, FoundY, 0, 0, A_ScreenWidth, A_ScreenHeight, %ModelImage%
-	ImageSearch, FoundX, FoundY, 340, 600, 800, 1600, %ModelImage%
+	ImageSearch, FoundX, FoundY, 340, 600, 600, 1600, %ModelImage%
 
 	if (ErrorLevel = 1) {
-        return
+		MsgBox Error ClickFile
+        exit
 	}
 
 	CenterX := FoundX + 40
@@ -293,7 +348,8 @@ ClickMessage()
 
 CaptureScreen(apk)
 {
-	Run, python E:\GitHub\Python\CaptureScreen.py %apk%, ,Hide
+	quotedComment := """" . COMMENT . """"
+	Run, python E:\GitHub\Python\CaptureScreen.py %apk% %PROJECT_NAME% %VERSION% %quotedComment%, ,Hide
 	Sleep, 1000
 }
 
@@ -303,6 +359,6 @@ CopyAPK(apk)
     Destination := FOLDER_PATH . "\" . apk ; 복사할 대상 경로
 
     ; 파일이 존재하는지 확인
-    FileCopy, %Source%, %Destination%, 0  ; 1 = 덮어쓰기 허용
+    FileCopy, %Source%, %Destination%, 1  ; 1 = 덮어쓰기 허용
 }
 

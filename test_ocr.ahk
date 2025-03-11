@@ -1,33 +1,101 @@
-#SingleInstance,Force
+#SingleInstance, Force
+#NoEnv  ; Recommended for performance and reliability.
+SendMode Input  ; Recommended for new scripts due to its superior speed and reliability.
+SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
 
-SetBatchLines, -1
-SendMode, Input
+; ∫Øºˆ º≥¡§
+CaptureX := 100  ; ƒ∏√≥ Ω√¿€ X ¡¬«•
+CaptureY := 100  ; ƒ∏√≥ Ω√¿€ Y ¡¬«•
+CaptureWidth := 400 ; ƒ∏√≥ ≥ ∫Ò
+CaptureHeight := 200 ; ƒ∏√≥ ≥Ù¿Ã
+OCR_Language := "kor" ; OCR ææÓ º≥¡§ («—±πæÓ)
 
-ocrPath := "C:\Program Files\Tesseract-OCR\tesseract.exe" ; Tesseract Í≤ΩÎ°ú
-screenshot := "D:\Util\aaa.png"
-outputText := "D:\Util\result"
+; ¥‹√‡≈∞ º≥¡§ (Ctrl+Shift+C)
+^+c::
+{
+    ; 1. »≠∏È ƒ∏√≥
+    ScreenshotFileName := "temp_screenshot.png"
 
-; F9 ÌÇ§Î°ú OCR Ïã§Ìñâ
-F9::
-    ; ÌôîÎ©¥ Ï∫°Ï≤ò (ÎìúÎûòÍ∑∏Î°ú ÏòÅÏó≠ ÏÑ†ÌÉù)
-    ;~ RunWait, mshta "javascript:var sh=new ActiveXObject('WScript.Shell');sh.SendKeys('^{PRTSC}');close()",, Hide
+    ; ¿¸√º »≠∏È ƒ∏√≥
+    DllCall("PrintWindow", "UInt", WinExist(), "UInt", DllCall("GetDC", "UInt", WinExist()), "UInt", 0)
+    hBitmap := DllCall("gdi32.dll\CreateCompatibleBitmap", "UInt", DllCall("gdi32.dll\GetDC", "UInt", 0), "Int", CaptureWidth, "Int", CaptureHeight)
+    hDC := DllCall("gdi32.dll\CreateCompatibleDC", "UInt", DllCall("gdi32.dll\GetDC", "UInt", 0))
+    hOld := DllCall("gdi32.dll\SelectObject", "UInt", hDC, "UInt", hBitmap)
 
-    ;~ ; ÌÅ¥Î¶ΩÎ≥¥Îìú Ïù¥ÎØ∏ÏßÄ Ï†ÄÏû•
-    ;~ Clipboard := ""
-    ;~ Send, ^v
-    ;~ ClipWait, 2
-    ;~ if !ClipboardAll
-    ;~ {
-        ;~ MsgBox, NO IMAGE.
-        ;~ return
-    ;~ }
-    ;~ FileDelete, %screenshot%
-    ;~ FileAppend, %ClipboardAll%, %screenshot%
+    ; ƒ∏√≥ øµø™ ∫πªÁ
+    DllCall("gdi32.dll\BitBlt", "UInt", hDC, "Int", 0, "Int", 0, "Int", CaptureWidth, "Int", CaptureHeight, "UInt", DllCall("gdi32.dll\GetDC", "UInt", 0), "Int", CaptureX, "Int", CaptureY, "UInt", 0x00CC0020)  ; SRCCOPY
 
-    ; Tesseract OCR Ïã§Ìñâ
-    RunWait, %ocrPath% "%screenshot%" "%outputText%" --oem 1 --psm 3, , Hide
+    ; ¿ÃπÃ¡ˆ ¿˙¿Â (GDI+ « ø‰)
+    pToken := Gdip_Startup()
+    Gdip_SaveBitmapToFile(hBitmap, ScreenshotFileName)
+    Gdip_Shutdown(pToken)
 
-    ; Í≤∞Í≥º ÏùΩÍ∏∞
-    FileRead, ocrResult, %outputText%.txt
-    MsgBox, Text:`n%ocrResult%
-return
+    ; 2. OCR Ω««‡
+    OCROutputFile := "temp_ocr_output.txt"
+    RunWait, tesseract "%ScreenshotFileName%" "%OCROutputFile%" -l %OCR_Language%,, Hide
+
+    ; 3. ≈ÿΩ∫∆Æ ¿–±‚
+    FileRead, OCRText, %OCROutputFile%.txt
+
+    ; 4. ≈¨∏≥∫∏µÂø° ∫πªÁ
+    Clipboard := OCRText
+
+    ; 5. ¡§∏Æ
+    FileDelete, %ScreenshotFileName%
+    FileDelete, %OCROutputFile%.txt
+    DllCall("gdi32.dll\SelectObject", "UInt", hDC, "UInt", hOld)
+    DllCall("gdi32.dll\DeleteDC", "UInt", hDC)
+    DllCall("gdi32.dll\DeleteObject", "UInt", hBitmap)
+
+    ; 6. æÀ∏≤
+    ToolTip, OCR øœ∑·! ≈¨∏≥∫∏µÂø° ∫πªÁµ«æ˙Ω¿¥œ¥Ÿ.
+    SetTimer, RemoveToolTip, -2000 ; 2√  »ƒ ≈¯∆¡ ¡¶∞≈
+    return
+}
+
+RemoveToolTip:
+    ToolTip
+    return
+
+; GDI+ «‘ºˆ (¿ÃπÃ¡ˆ ¿˙¿Â¿ª ¿ß«ÿ « ø‰)
+Gdip_Startup() {
+    If !DllCall("GetModuleHandle", "Str", "gdiplus.dll", "Ptr")
+        DllCall("LoadLibrary", "Str", "gdiplus.dll")
+    VarSetCapacity(pToken,8,0)
+    gdiplus := {Startup: "GdiplusStartup", Shutdown: "GdiplusShutdown", CreateBitmapFromFile: "GdipCreateBitmapFromFile", GetImageWidth: "GdipGetImageWidth", GetImageHeight: "GdipGetImageHeight", DeleteGraphics: "GdipDeleteGraphics", CreateHDC: "GdipCreateHDCFromGraphics", GetGraphicsContext: "GdipGetImageGraphicsContext", ReleaseDC: "GdipReleaseDC", CreateBitmapFromHBITMAP: "GdipCreateBitmapFromHBITMAP", CreateBitmapFromHWND: "GdipCreateBitmapFromHWND", CreateGraphicsFromHDC: "GdipCreateGraphicsFromHDC", CreateStringFormat: "GdipCreateStringFormat", SetStringFormatFlags: "GdipSetStringFormatFlags", DeleteStringFormat: "GdipDeleteStringFormat", DrawString: "GdipDrawString", CreateSolidBrush: "GdipCreateSolidBrush", DeleteBrush: "GdipDeleteBrush", CreatePen1: "GdipCreatePen1", DeletePen: "GdipDeletePen", DrawLine: "GdipDrawLine", CreateFont: "GdipCreateFont", DeleteFont: "GdipDeleteFont", DeleteBitmap: "GdipDeleteBitmap", DrawImage: "GdipDrawImage", GetImageEncodersSize: "GdipGetImageEncodersSize", GetImageEncoders: "GdipGetImageEncoders", GetEncoderClsid: "GdipGetEncoderClsid", SaveBitmapToFile: "GdipSaveBitmapToFile", CreateMatrix: "GdipCreateMatrix", RotateMatrix: "GdipRotateMatrix", DeleteMatrix: "GdipDeleteMatrix", SetWorldTransform: "GdipSetWorldTransform", InvertMatrix: "GdipInvertMatrix", TransformMatrixPoints: "GdipTransformMatrixPoints", CreateRegion: "GdipCreateRegion", SetEmptyRegion: "GdipSetEmptyRegion", SetRectRegion: "GdipSetRectRegion", DeleteRegion: "GdipDeleteRegion", IsVisibleRegionPointI: "GdipIsVisibleRegionPointI", GetRegionScans: "GdipGetRegionScans", SetInfiniteRegion: "GdipSetInfiniteRegion", SetPathRegion: "GdipSetPathRegion", CreatePath: "GdipCreatePath", DeletePath: "GdipDeletePath", AddPathRectangleI: "GdipAddPathRectangleI", GetPathData: "GdipGetPathData", StartPathFigure: "GdipStartPathFigure", AddPathLineI: "GdipAddPathLineI", ClosePathFigure: "GdipClosePathFigure", CreateFromGraphics: "GdipCreateFromGraphics", MeasureString: "GdipMeasureString"}
+    If (NumGet(pToken,0,"UInt") == 0)
+    {
+        VarSetCapacity(si,16,0)
+        NumPut(1,si,0,"UInt")
+        DllCall("gdiplus\GdiplusStartup", "UPtr*", pToken, "Ptr", &si, "Ptr", 0)
+    }
+    return pToken
+}
+
+Gdip_Shutdown(pToken) {
+    DllCall("gdiplus\GdiplusShutdown", "UPtr", pToken)
+}
+
+Gdip_SaveBitmapToFile(hBitmap, Filename) {
+  static CLSID := "{557cf406-1a04-11d3-9a73-0000f81ef32e}" ; png encoder
+  VarSetCapacity(EncoderClsid,16,0)
+  if !CLSID
+  {
+      num := 0, size := 0
+      DllCall("gdiplus\GdipGetImageEncodersSize", "UInt*", num, "UInt*", size)
+      VarSetCapacity(Encoders,size)
+      DllCall("gdiplus\GdipGetImageEncoders", "UInt", num, "UInt", size, "Ptr", &Encoders)
+      Loop %num%
+      {
+        offset := (A_Index - 1) * 116
+        Guid := SubStr(StrReplace(Format("{:U}", NumGet(Encoders,offset + 0,"CLSID")), "0x", ""),2)
+        if (Guid = "{557cf406-1a04-11d3-9a73-0000f81ef32e}") ; png encoder
+        {
+           DllCall("ole32\CLSIDFromString", "WStr", Guid, "Ptr", &EncoderClsid)
+           break
+        }
+      }
+  }
+  else DllCall("ole32\CLSIDFromString", "WStr", CLSID, "Ptr", &EncoderClsid)
+  return DllCall("gdiplus\GdipSaveBitmapToFile", "UInt", hBitmap, "WStr", Filename, "Ptr", &EncoderClsid, "Ptr", 0)
+}
