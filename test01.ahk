@@ -12,11 +12,13 @@ global PROJECT_NAME := ""
 global FOLDER_PATH = "R:\U100_Release\"
 
 FormatTime, VERSION, %A_Now%, 3.MM.dd
-FormatTime, Today,, yyyy_MMdd   ; 오늘 날짜를 YYYY-MM-DD 형식으로 가져오기
-FOLDER_PATH := "R:\U100_Release\" . Today  ; 폴더 경로 지정
+FormatTime, Month,, yyyy_MM   ;
+FormatTime, Today,, dd   ;
+FOLDER_PATH := "R:\U100_Release\" . Month . "\" . Today ; 폴더 경로 지정
 
 if (!FileExist(FOLDER_PATH)) {    ; 폴더가 존재하지 않으면
 	FileCreateDir, %FOLDER_PATH%  ; 폴더 생성
+	ExitApp
 }
 
 
@@ -24,15 +26,14 @@ if (!FileExist(FOLDER_PATH)) {    ; 폴더가 존재하지 않으면
 AppsKey & Numpad1::
 	MODEL_INDEX := 31
 	APK_NAME = EM_DataService
-	COMMENT = 최신소스 빌드 J120 적용
+	COMMENT = 초기 부팅 시 동의함 전에 사이드바에 배경화면 보였다가 사라짐개선 (KGMJ116MY-18)
 	return
 
 ; ScreenService
 AppsKey & Numpad2::
 	MODEL_INDEX := 28
 	APK_NAME = EM_ScreenService
-	COMMENT = Variant 처리 오류로 재업로드
-
+	COMMENT = BACK_BUTTON에 대한 예외처리 (이전화면이 비활성인 경우 Launcher로 이동처리. KGMJ140-231)
 	return
 
 ; MicomService
@@ -46,14 +47,14 @@ AppsKey & Numpad3::
 AppsKey & Numpad4::
 	MODEL_INDEX := 35
 	APK_NAME = EM_SystemService
-	COMMENT = Variant 처리 오류로 재업로드
+	COMMENT = 엔진정보 property 설정 코드 오류 수정 (DGO100-518)
 	return
 
 ; AudioService
 AppsKey & Numpad5::
 	MODEL_INDEX := 0
 	APK_NAME = EM_AudioService
-	COMMENT = AudioPath 6인경우 Path 1로 처리 (AA No Ducking 모드인경우. 6으로 처리시 라디오 소리 들림)
+	COMMENT = Power off audio 요청실패시 딜레이 후 retry 코드 추가
 	return
 
 ; ClusterService
@@ -74,14 +75,14 @@ AppsKey & Numpad7::
 AppsKey & Numpad8::
 	MODEL_INDEX := 18
 	APK_NAME = EM_CCU
-	COMMENT = KGM LINK 적용
+	COMMENT = 문구 오류 수정
 	return
 
 ; Launcher
 AppsKey & Numpad9::
 	MODEL_INDEX := 1
 	APK_NAME = EM_Launcher
-	COMMENT = Variant 처리 오류로 재업로드
+	COMMENT = TBT 위젯에서 상단 전체거리 단위 글자 짤림 수정 (DGJ140-364)
 	return
 
 AppsKey & Numpad0::
@@ -107,6 +108,48 @@ InputParameter()
 	ClickModelName()
 	Sleep, 200
 	; Launcher
+	Send, {Down %MODEL_INDEX%}
+	Send, {Enter}
+
+	ClickApkVersion()
+	Clipboard := "V"
+	SendInput ^v
+	Send, %VERSION%
+
+	;~ if (APK_MODEL == "_J120.APK")
+		ClickCheckBox()
+
+
+	ClickFile()
+	Sleep, 2000
+	FilePath := "E:\U100\App\Output\" . APK_NAME . APK_MODEL
+	;~ FilePath := "E:\U100_checkout\u100-app\App\Output\" . APK_NAME . APK_MODEL
+	Clipboard := FilePath ; 클립보드에 파일 경로 복사
+
+	SendInput ^v{Enter}
+
+	Sleep, 500
+	CopyAPK(APK_NAME . APK_MODEL)
+
+	;~ Send, {End}
+
+	;~ Sleep, 2000
+
+	ClickMessage()
+	Sleep, 500
+	Clipboard = %COMMENT%
+	SendInput ^v
+
+	CaptureScreen(APK_NAME)
+
+}
+
+InputParameter2()
+{
+	; PROJECT NAME
+	CheckProjectName()
+
+	Send, {Tab}
 	Send, {Down %MODEL_INDEX%}
 	Send, {Enter}
 
@@ -189,6 +232,11 @@ CheckProjectName()
   else if (InStr(projectlName, "j116_25my"))
   {
     PROJECT_NAME = "J116_25MY"
+	APK_MODEL = _J120.APK
+  }
+  else if (InStr(projectlName, "300"))
+  {
+    PROJECT_NAME = "Q300_HQX"
 	APK_MODEL = _J120.APK
   }
   else
@@ -319,8 +367,8 @@ ClickFile()
         exit
 	}
 
-	CenterX := FoundX + 40
-	CenterY := FoundY + 10
+	CenterX := FoundX + 30
+	CenterY := FoundY + 15
 
 	MouseMove, CenterX, CenterY
 	Click

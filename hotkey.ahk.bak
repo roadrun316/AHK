@@ -1,0 +1,8 @@
+#SingleInstance, Force
+RCtrl::
+	MsgBox, Hello
+	return
+
+RShift::
+	MsgBox, Hello
+	return

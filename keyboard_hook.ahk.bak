@@ -1,0 +1,4 @@
+#InstallKeybdHook
+~*Volume_Up::
+    KeyHistory
+    Return
