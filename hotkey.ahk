@@ -1,8 +1,4 @@
-#SingleInstance, Force
-SC11D::
-	MsgBox, Hello
-	return
+#Requires AutoHotkey v2.0
+;#SingleInstance, Force
 
-RShift::
-	MsgBox, Hello
-	return
+RShift:: MsgBox("!!!")
