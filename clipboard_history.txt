@@ -1,1 +1,3 @@
-1 && EMDataManager.getInstance().GetLiveDataInt(EMData.CARSIGNAL_CLUSTER_SPI_ERROR) == 0) {£ür£ü£ün£ü                                EMDataManager.getInstance().SetLiveDataInt(EMData.CARSIGNAL_CLUSTER_SPI_ERROR, data[1]);£ür£ü£ün£ü                            } else if (data[1] == 0 && EMDataManager.getInstance().GetLiveDataInt(EMData.CARSIGNAL_CLUSTER_SPI_ERROR) == 1) {£ür£ü£ün£ü                                EMDataManager.getInstance().SetLiveDataInt(EMData.CARSIGNAL_CLUSTER_SPI_ERROR, data[1]);£ür£ü£ün£ü                            }£ür£ü£ün£ü                        }
+V3.9.12
+2025-09-15
+08-26 14:57:09.656  1985  2057 V MICOM_LOG: [ 0053.259]* VOL - MAIN 031 HF 010 NAVI 026 REAR 015 VOICE 003 BEEP 001£ür£ü£ün£ü08-26 14:57:09.658  1985  2057 V MICOM_LOG:                     001 031£ür£ü£ün£ü08-26 14:57:09.663  1985  2057 V MICOM_LOG:  DSP_MAIN_VOL 31 mute: 0£ür£ü£ün£ü08-26 14:57:09.676  1985  2057 V MICOM_LOG: [ 0053.270]* AUDIO MODE 002 SUB 000

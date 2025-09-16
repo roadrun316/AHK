@@ -1,8 +1,16 @@
+Ôªø; ===================================================================================================
+; EMAT AutoHotkey Script - Ïï†ÌîåÎ¶¨ÏºÄÏù¥ÏÖò Ï†ÑÌôò Î∞è ÏûêÎèôÌôî Ïä§ÌÅ¨Î¶ΩÌä∏
+; ===================================================================================================
+
+; Ï§ëÎ≥µ Ïã§Ìñâ Î∞©ÏßÄ
+#SingleInstance Force
+#SingleInstance Off
+
 SetTitleMatchMode, 2
 
-; ---------------------------------------------------------------------------------------------------
-; TeraTerm
-; ---------------------------------------------------------------------------------------------------
+; ===================================================================================================
+; TERATERM AUTOMATION
+; ===================================================================================================
 #IfWinActive ahk_exe ttermpro.exe
 !1::
 	sendInput setprop persist.hibernated 0{Enter}
@@ -19,9 +27,9 @@ return
 	sendInput killall C300SystemService{Enter}
 return
 #IfWinActive
-; ---------------------------------------------------------------------------------------------------
-; Windows Terminal
-; ---------------------------------------------------------------------------------------------------
+; ===================================================================================================
+; WINDOWS TERMINAL AUTOMATION
+; ===================================================================================================
 #IfWinActive ahk_exe WindowsTerminal.exe
 ^NumpadDot:: sendInput adb disconnect
 ^Numpad0:: sendInput adb connect 192.168.3.3
@@ -72,30 +80,29 @@ return
 		}
 	}
 	IfWinActive, wglim
-	    IfExist, D:\Log\%Folder%\sdcard\EMLog  ; EMLog ∆˙¥ı∞° ¿÷¥¬¡ˆ »Æ¿Œ
-			sendInput cd %Folder%/sdcard/EMLog/main{Enter}
-        else
+		IfExist, D:\Log\%Folder%\sdcard\EMLog
+			sendInput cd "%Folder%/sdcard/EMLog/main"{Enter}
+		else
 			sendInput cd %Folder%/sdcard/WTLog/main{Enter}
 	else
-		IfExist, D:\Log\%Folder%\sdcard\EMLog  ; EMLog ∆˙¥ı∞° ¿÷¥¬¡ˆ »Æ¿Œ
+		IfExist, D:\Log\%Folder%\sdcard\EMLog
 			sendInput cd %Folder%\sdcard\EMLog\main{Enter}
 		else
 			sendInput cd %Folder%\sdcard\WTLog\main{Enter}
 return
-; --- ƒ⁄µÂ ---
-;!Numpad7:: RecentlyFolder() ; ¥‹√‡≈∞ F1 (ø¯«œ¥¬ ≈∞∑Œ ∫Ø∞Ê ∞°¥…)
-;!Numpad7:: ShowRecentLogFolders()
 !Numpad7:: GoRecentlyFolder()
 #IfWinActive 
 ; ---------------------------------------------------------------------------------------------------
 ; Launcher_Mail
 ; ---------------------------------------------------------------------------------------------------
-; Launch_Mail: ∏∂øÏΩ∫ BackKey∏¶ Launch_Mail ≈∞∑Œ «“¥Á
-; ∞≥πﬂ ≈¯¿Ã≥™ ∆ƒ¿œ ∞¸∏Æ¿⁄ø°º≠ Launch Mail ≈∞∑Œ Ctrl+F4 ∫∏≥ª±‚
+; Launch_Mail: ÎßàÏö∞Ïä§ BackKeyÎ•º Launch_Mail ÌÇ§Î°ú Ìï†Îãπ
+; Í∞úÎ∞ú Ìà¥Ïù¥ÎÇò ÌååÏùº Í¥ÄÎ¶¨ÏûêÏóêÏÑú Launch Mail ÌÇ§Î°ú Ctrl+F4 Î≥¥ÎÇ¥Í∏∞
 #IfWinActive ahk_exe studio64.exe
 Launch_Mail::Send, ^{F4}
+F21::WinActivate, ahk_exe cursor.exe
 #IfWinActive ahk_exe cursor.exe
 Launch_Mail::Send, ^{F4}
+F21::WinActivate, ahk_exe studio64.exe
 #IfWinActive ahk_exe code.exe
 Launch_Mail::Send, ^{F4}
 #IfWinActive ahk_exe dopus.exe
@@ -104,7 +111,7 @@ Launch_Mail::Send, ^{F4}
 Launch_Mail::Send, ^{F4}
 #IfWinActive ahk_exe Merge.exe
 Launch_Mail::Send, ^{F4}
-; ¿• ∫Í∂ÛøÏ¿˙ø°º≠¥¬ Ctrl+W∑Œ ≈« ¥›±‚
+; Ïõπ Î∏åÎùºÏö∞Ï†ÄÏóêÏÑúÎäî Ctrl+WÎ°ú ÌÉ≠ Îã´Í∏∞
 #IfWinActive ahk_exe whale.exe
 Launch_Mail::Send, ^w
 #IfWinActive ahk_exe msedge.exe
@@ -115,13 +122,13 @@ Launch_Mail::Send, ^w
 Launch_Mail::Send, ^w
 #IfWinActive ahk_exe WindowsTerminal.exe
 Launch_Mail::Send, ^+w
-; «÷≈∞ ƒ¡≈ÿΩ∫∆Æ √ ±‚»≠
+; Ìï´ÌÇ§ Ïª®ÌÖçÏä§Ìä∏ Ï¥àÍ∏∞Ìôî
 #IfWinActive
 
 Launch_Mail:: Send, !{F4}
-; ---------------------------------------------------------------------------------------------------
-; Global
-; ---------------------------------------------------------------------------------------------------
+; ===================================================================================================
+; GLOBAL HOTKEYS & FOLDER SHORTCUTS
+; ===================================================================================================
 ;SC11D:: return
 AppsKey & D::OpenOrSetDialog("D:\Download")
 AppsKey & L::OpenOrSetDialog("D:\Log")
@@ -130,10 +137,10 @@ AppsKey & O::OpenOrSetDialog("E:\U100\App\Output")
 AppsKey & G::OpenOrSetDialog("E:\GitHub")
 AppsKey & P::OpenOrSetDialog("E:\GitHub\Python")
 AppsKey & T::OpenOrSetDialog("R:\Temp")
-AppsKey & K::OpenOrSetDialog("C:\Users\roadr\Documents\ƒ´ƒ´ø¿≈Â πﬁ¿∫ ∆ƒ¿œ")
+AppsKey & K::OpenOrSetDialog("C:\Users\roadr\Documents\Ïπ¥Ïπ¥Ïò§ÌÜ° Î∞õÏùÄ ÌååÏùº")
 AppsKey & R::OpenOrSetDialog("R:\OneDrive")
 
-^Volume_Mute:: MsgBox, Mute
+^Volume_Mute:: return
 
 AppsKey::
 ;        Menu, MyFolderMenu, DeleteAll
@@ -145,8 +152,8 @@ AppsKey::
 	Menu, MyFolderMenu, Add, E:\GitHub, MenuHandler
 	Menu, MyFolderMenu, Add, E:\GitHub\Python, MenuHandler
 	Menu, MyFolderMenu, Add, C:\Users\roadr, MenuHandler
-	Menu, MyFolderMenu, Add, C:\Users\roadr\Documents\ƒ´ƒ´ø¿≈Â πﬁ¿∫ ∆ƒ¿œ, MenuHandler
-	Menu, MyFolderMenu, Add, (¥›»˚), DummyHandler
+	Menu, MyFolderMenu, Add, C:\Users\roadr\Documents\Ïπ¥Ïπ¥Ïò§ÌÜ° Î∞õÏùÄ ÌååÏùº, MenuHandler
+	Menu, MyFolderMenu, Add, (Îã´Ìûò), DummyHandler
 	Menu, MyFolderMenu, Show
 return
 
@@ -159,9 +166,11 @@ MenuHandler:
     isMenuVisible := false
 return
 
-; ---------------------------------------------------------------------------------------------------
+; ===================================================================================================
+; APPLICATION TOGGLING (WIN + NUMPAD)
+; ===================================================================================================
 #Numpad0:: TOGGLE_EXE("WindowsTerminal.exe", "C:\Program Files\WindowsApps\Microsoft.WindowsTerminal_1.22.11141.0_x64__8wekyb3d8bbwe\WindowsTerminal.exe")
-;	TOGGLE_TITLE("∏Ì∑… «¡∑“«¡∆Æ")
+;	TOGGLE_TITLE("Î™ÖÎ†π ÌîÑÎ°¨ÌîÑÌä∏")
 ;	TOGGLE_TITLE("wglim@wglim-pc")
 ;return
 #Numpad1:: GoAndroidStudio(0)
@@ -174,14 +183,19 @@ return
  ;#Numpad7::	TOGGLE_TITLE("YouTube Music")
  
 #Numpad8::
-    hwnd := WinExist("emat.ahk")
+    hwnd := WinExist("ahk_exe code.exe")
     if (hwnd) {
-        if WinActive("ahk_id " hwnd)
-            WinMinimize, ahk_id %hwnd%
-        else
-            WinActivate, ahk_id %hwnd%
+        WinGetTitle, title, ahk_id %hwnd%
+        if (InStr(title, "emat.ahk")) {
+            if WinActive("ahk_id " hwnd)
+                WinMinimize, ahk_id %hwnd%
+            else
+                WinActivate, ahk_id %hwnd%
+        } else {
+            Run, "C:\Users\roadr\AppData\Local\Programs\Microsoft VS Code\Code.exe" E:\GitHub\AHK\emat.ahk
+        }
     } else {
-        Run, "C:\Program Files\Notepad3\Notepad3.exe" R:\OneDrive\Environment\º≥¡§ πËƒ° ∆ƒ¿œ\emat.ahk
+        Run, "C:\Users\roadr\AppData\Local\Programs\Microsoft VS Code\Code.exe" E:\GitHub\AHK\emat.ahk
     }
 return
 #Numpad9:: TOGGLE_EXE("Merge.exe", "C:\Program Files\Araxis\Araxis Merge\Merge.exe")
@@ -197,8 +211,8 @@ return
   ;~ WinActivate, ahk_exe studio64.exe
   ;~ WinWaitActive, ahk_exe studio64.exe, , 5
   ;~ Send {Ctrl}G
-  ;~ Sleep 100
-  ;~ ; ≈¨∏≥∫∏µÂ ≥ªøÎ ¡˜¡¢ ¿¸º€
+  ;~ Sleep, 100
+  ;~ ; ÌÅ¥Î¶ΩÎ≥¥Îìú ÎÇ¥Ïö© ÏßÅÏ†ë Ï†ÑÏÜ°
   ;~ Send %Clipboard%
   ;~ Send {Enter}Send 
 return
@@ -208,14 +222,15 @@ return
 return
 
 #NumpadAdd::Send {Media_Next}
-#NumpadSub:: WinActivate, ahk_exe SMemo.exeSend 
+#NumpadSub:: WinActivate, ahk_exe SMemo.exe
 #NumpadDiv:: Run, C:\Program Files\AutoHotkey\WindowSpy.ahk
 #NumpadMult:: Run, E:\GitHub\AHK\keyboard_hook.ahk
-^Numpad9:: sendRaw find / ! \( -path /proc -prune \) -name "*.rc" -exec grep -Hni XXX '{}' \;SendSend 
+^Numpad9:: sendRaw find / ! \( -path /proc -prune \) -name "*.rc" -exec grep -Hni XXX '{}' \;
 
 
-; ---------------------------------------------------------------------------------------------------
-; Clauch Ω««‡Ω√ ¥‹√‡≈∞ √≥∏Æ
+; ===================================================================================================
+; CLAUNCH & CLCL KEY MAPPINGS
+; ===================================================================================================
 #IfWinActive ahk_exe Claunch.exe
 F19::Send, 1
 F20::Send, 2
@@ -230,31 +245,41 @@ F19:: Send, {Esc}
 #IfWinActive
 
 
-F15:: Send, °€
+F22:: Send, ‚óã
+F14:: Send, #+{Left} 
+F15:: Send, #+{Right} 
 
-F19:: Send, !c ; clcl »£√‚
+; F19:: Send, !c ; clcl Ìò∏Ï∂ú
+F19:: TOGGLE_TITLE("Ïù¥ÏÅúÎ∂ÄÏù∏")
 F21:: TOGGLE_EXE("dopus.exe")
-F22:: TOGGLE_TITLE("¿Ãª€∫Œ¿Œ")
-F23:: Send, ^#!c ; Claunch »£√‚
-F18:: Send, ^!{Numpad7} ; clcl Template Coding »£√‚
+F23:: Send, ^#!c ; Claunch Ìò∏Ï∂ú
+; F18:: Send, ^!{Numpad7} ; clcl Template Coding Ìò∏Ï∂ú
 
-; ---------------------------------------------------------------------------------------------------
-^!#F7:: TOGGLE_EXE("Perplexity.exe", "C:\Users\roadr\AppData\Local\Programs\Perplexity\Perplexity.exe")
-^!#F8:: TOGGLE_EXE("ChatGPT.exe", "C:\Users\roadr\AppData\Local\Microsoft\WindowsApps\chatgpt.exe")
-^!#F9:: TOGGLE_TITLE("Google Gemini", "C:\Users\roadr\AppData\Roaming\Microsoft\Internet Explorer\Quick Launch\User Pinned\ImplicitAppShortcuts\9501e18d7c2ab92e\ø¯±‘ - Chrome.lnk")
-^!#F10:: TOGGLE_EXE("msedge.exe")
-^!#F11:: TOGGLE_TITLE("Chrome", "C:\Users\roadr\AppData\Roaming\Microsoft\Internet Explorer\Quick Launch\User Pinned\TaskBar\Chrome.lnk")
-^!#F12:: TOGGLE_TITLE("Whale", "C:\Users\roadr\AppData\Roaming\Microsoft\Internet Explorer\Quick Launch\User Pinned\TaskBar\≥◊¿Ãπˆ ø˛¿œ.lnk")
 
-^!#F1:: TOGGLE_TITLE("Google AI Studio", "C:\Users\roadr\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\≥◊¿Ãπˆ ø˛¿œ æ€\Google AI Studio.lnk")
-^!#F2:: TOGGLE_EXE("Joplin.EXE", "C:\Program Files\Joplin\Joplin.exe")
+; ===================================================================================================
+; BROWSER & AI TOOLS (CTRL+ALT+WIN+F Keys)
+; ===================================================================================================
+^!+#F19:: TOGGLE_EXE("dopus.exe")
+^!+#F20:: TOGGLE_TITLE("Whale", "C:\Users\roadr\AppData\Roaming\Microsoft\Internet Explorer\Quick Launch\User Pinned\TaskBar\ÎÑ§Ïù¥Î≤Ñ Ïõ®Ïùº.lnk")
+^!+#F22:: TOGGLE_TITLE("Ïù¥ÏÅúÎ∂ÄÏù∏")
+^!+#F23:: GoAndroidStudio(0)
+^!+#F24:: GoAndroidStudio(1)
+;^!#F7:: TOGGLE_EXE("Perplexity.exe", "C:\Users\roadr\AppData\Local\Programs\Perplexity\Perplexity.exe")
+;^!#F8:: TOGGLE_EXE("ChatGPT.exe", "C:\Users\roadr\AppData\Local\Microsoft\WindowsApps\chatgpt.exe")
+;^!#F9:: TOGGLE_TITLE("Google Gemini", "C:\Users\roadr\AppData\Roaming\Microsoft\Internet Explorer\Quick Launch\User Pinned\ImplicitAppShortcuts\9501e18d7c2ab92e\ÏõêÍ∑ú - Chrome.lnk")
+;^!#F10:: TOGGLE_EXE("msedge.exe")
+;^!#F11:: TOGGLE_TITLE("Chrome", "C:\Users\roadr\AppData\Roaming\Microsoft\Internet Explorer\Quick Launch\User Pinned\TaskBar\Chrome.lnk")
+;^!#F12:: TOGGLE_TITLE("Whale", "C:\Users\roadr\AppData\Roaming\Microsoft\Internet Explorer\Quick Launch\User Pinned\TaskBar\ÎÑ§Ïù¥Î≤Ñ Ïõ®Ïùº.lnk")
+
+;^!#F1:: TOGGLE_TITLE("Google AI Studio", "C:\Users\roadr\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\ÎÑ§Ïù¥Î≤Ñ Ïõ®Ïùº Ïï±\Google AI Studio.lnk")
+;^!#F2:: TOGGLE_EXE("Joplin.EXE", "C:\Program Files\Joplin\Joplin.exe")
 
 Macro_ClusterAppUpload()
 {
 	Send, adb shell{Enter}
 	Send, su{Enter}
 	Send, ssh root@192.168.1.1{Enter}
-	Sleep 1000
+	Sleep, 1000
 	Send, yes{Enter}
 	Send, slay vt_avm{Enter}
 	Send, cd /data/vt_avm_file{Enter}
@@ -268,28 +293,28 @@ Macro_GPU_busy()
 	Send, adb shell{Enter}
 	Send, su{Enter}
 	Send, ssh root@192.168.1.1{Enter}
-	Sleep 1000
+	Sleep, 1000
 	Send, yes{Enter}
 	Send, echo gpu_set_log_level 4 >/dev/kgsl-control{Enter}
-	Sleep 1000
+	Sleep, 1000
 	Send, echo gpubusystats 400 >/dev/kgsl-control{Enter}
-	Sleep 1000
+	Sleep, 1000
 	Send, slog2info -b KGSL -w | grep measurement | grep 'percentage busy' | awk '{{}print ($NF){}}\'{Enter}
 ;	Send, slog2info -b KGSL -w | grep measurement | grep "percentage busy" | awk '{print ($NF)}'{Enter}
 }
 
 ^!#F6::
 ;        Menu, MyFolderMenu, DeleteAll
-	Menu, MyFolderMenu2, Add, GPU ∫Œ«œ √¯¡§, MenuHandler2
+	Menu, MyFolderMenu2, Add, GPU Î∂ÄÌïò Ï∏°Ï†ï, MenuHandler2
 	Menu, MyFolderMenu2, Add, Cluster App Upload, MenuHandler2
-	Menu, MyFolderMenu2, Add, (¥›»˚), DummyHandler
+	Menu, MyFolderMenu2, Add, (Îã´Ìûò), DummyHandler
 	Menu, MyFolderMenu2, Show
 return
 
 MenuHandler2:
     global isMenuVisible2
     selectedMacro := A_ThisMenuItem
-    if (selectedMacro = "GPU ∫Œ«œ √¯¡§")
+    if (selectedMacro = "GPU Î∂ÄÌïò Ï∏°Ï†ï")
     {
         Macro_GPU_busy()
     }
@@ -301,49 +326,34 @@ MenuHandler2:
 return
 
 
-; -------------------------------------------------------------------Send --------------------------------
+; ===================================================================================================
+; FUNCTION KEY MAPPINGS & UTILITIES
+; ===================================================================================================
 #F2::
 	Run, "C:\Program Files\Notepad3\Notepad3.exe"
 return
-; Notepad++ø°º≠ Ctrl+∏∂øÏΩ∫ øÏ≈¨∏ØΩ√ AndroidStudio º“Ω∫∑Œ ¿Ãµø
+; Notepad++ÏóêÏÑú Ctrl+ÎßàÏö∞Ïä§ Ïö∞ÌÅ¥Î¶≠Ïãú AndroidStudio ÏÜåÏä§Î°ú Ïù¥Îèô
 ^RButton::
   IfWinActive ahk_class Notepad++
   {
 	  sendInput {Home}{ShiftDown}{End}{ShiftUp}^c
-	  Sleep 100
+	  Sleep, 100
 	  Run, python E:\GitHub\Python\GotoSource.py, ,Hide
-	  ;~ Sleep 1000
+	  ;~ Sleep, 1000
 ;	  WinActivate, ahk_exe studio64.exe
 		;~ GoAndroidStudio()
 	}
 return
-;OpenOrSetDialog(path) {
-;     ∆ƒ¿œ º±≈√√¢(class: #32770) ∞Àªˆ
-;    WinGet, winList, List, ahk_class #32770
-;    Loop, %winList%
-;    {
-;        this_id := winList%A_Index%
-;        ControlGet, exist, Hwnd,, Edit1, ahk_id %this_id%
-;        if (exist) {
-;             Edit1¿Ã ¡∏¿Á«œ¥¬ ∞ÊøÏ = ∆ƒ¿œ º±≈√√¢ ∏¬¿Ω
-;            ControlSetText, Edit1, %path%, ahk_id %this_id%
-;            ControlSend, Edit1, {Enter}, ahk_id %this_id%
-;            return
-;        }
-;    }
-;     æ¯¿∏∏È ≈Ωªˆ±‚ Ω««‡
-;    Run, %path%
-;}
 OpenOrSetDialog(path) {
-    ; 1. ∆ƒ¿œ ø≠±‚ ¥Î»≠ªÛ¿⁄ (#32770 + Edit1) »Æ¿Œ
+    ; 1. ÌååÏùº Ïó¥Í∏∞ ÎåÄÌôîÏÉÅÏûê (#32770 + Edit1) ÌôïÏù∏
     WinGet, winList, List, ahk_class #32770
     Loop, %winList%
     {
         this_id := winList%A_Index%
-		; √¢¿« Ω««‡ ∆ƒ¿œ(exe) ¿Ã∏ß »Æ¿Œ
+		; Ï∞ΩÏùò Ïã§Ìñâ ÌååÏùº(exe) Ïù¥Î¶Ñ ÌôïÏù∏
 		WinGet, exeName, ProcessName, ahk_id %this_id%
 		if (exeName = "YES24eBook.exe")
-			continue  ; ¿Ã √¢¿∫ π´Ω√«œ∞Ì ¥Ÿ¿Ω √¢¿∏∑Œ ≥—æÓ∞®
+			continue  ; Ïù¥ Ï∞ΩÏùÄ Î¨¥ÏãúÌïòÍ≥† Îã§Ïùå Ï∞ΩÏúºÎ°ú ÎÑòÏñ¥Í∞ê
         ControlGet, exist, Hwnd,, Edit1, ahk_id %this_id%
         if (exist) {
             ControlSetText, Edit1, %path%, ahk_id %this_id%
@@ -351,10 +361,10 @@ OpenOrSetDialog(path) {
             return
         }
     }
-    ; 2. «ˆ¿Á √¢¿Ã Windows ≈Ωªˆ±‚¿œ ∞ÊøÏ °Ê ∞Ê∑Œ ∫Ø∞Ê
+    ; 2. ÌòÑÏû¨ Ï∞ΩÏù¥ Windows ÌÉêÏÉâÍ∏∞Ïùº Í≤ΩÏö∞ ‚Üí Í≤ΩÎ°ú Î≥ÄÍ≤Ω
     WinGetClass, activeClass, A
     if (activeClass = "CabinetWClass") {
-        Send, !d       ; Alt + D °Ê ¡÷º“√¢
+        Send, !d       ; Alt + D ‚Üí Ï£ºÏÜåÏ∞Ω
         Sleep, 100
         Send, %path%{Enter}
         return
@@ -368,13 +378,13 @@ OpenOrSetDialog(path) {
 		}
 		else 
 		{
-			drive := SubStr(path, 1, 2)      ; øπ: D:
-			subPath := SubStr(path, 3)       ; øπ: \Download ∂«¥¬ \Users\Me...
+			drive := SubStr(path, 1, 2)      ; Ïòà: D:
+			subPath := SubStr(path, 3)       ; Ïòà: \Download ÎòêÎäî \Users\Me...
 			SendInput, %drive% & cd %subPath%{Enter}
 		}
 		return
     }
-    ; 3. ±‚∫ª µø¿€ (DOpus∑Œ ø≠∏≤)
+    ; 3. Í∏∞Î≥∏ ÎèôÏûë (DOpusÎ°ú Ïó¥Î¶º)
     Run, %path%
 }
 TOGGLE_TITLE(procName, filePath="") {
@@ -383,7 +393,7 @@ TOGGLE_TITLE(procName, filePath="") {
     else {
     WinGet, processID, PID, %procName%
         if (!processID) {
-            ; «¡∑ŒººΩ∫∞° Ω««‡ ¡ﬂ¿Ã æ∆¥œ∏È Ω««‡
+            ; ÌîÑÎ°úÏÑ∏Ïä§Í∞Ä Ïã§Ìñâ Ï§ëÏù¥ ÏïÑÎãàÎ©¥ Ïã§Ìñâ
             if (filePath != "") {
                 Run, %filePath%
             } 
@@ -398,7 +408,7 @@ TOGGLE_EXE(procName, filePath="") {
     else {
 		WinGet, processID, ID, ahk_exe %procName%
         if (!processID) {
-            ; «¡∑ŒººΩ∫∞° Ω««‡ ¡ﬂ¿Ã æ∆¥œ∏È Ω««‡
+            ; ÌîÑÎ°úÏÑ∏Ïä§Í∞Ä Ïã§Ìñâ Ï§ëÏù¥ ÏïÑÎãàÎ©¥ Ïã§Ìñâ
             if (filePath != "") {
                 Run, %filePath%
             } 
@@ -414,13 +424,13 @@ GoAndroidStudio(opt)
     {
         this_id := id%A_Index%
         WinGetTitle, title, ahk_id %this_id%
-        ; opt=0: U100∏∏ ∆˜«‘
-        ; opt=1: U100, Logcat ∆˜«‘
+        ; opt=0: U100Îßå Ìè¨Ìï®
+        ; opt=1: U100, Logcat Ìè¨Ìï®
         if (opt = 0 && (!InStr(title, "U100") || InStr(title, "Logcat")))
             continue
         if (opt = 1 && !InStr(title, "Logcat"))
             continue
-        ; ≈‰±€ µø¿€
+        ; ÌÜ†Í∏Ä ÎèôÏûë
         if WinActive("ahk_id " . this_id)
             WinMinimize, ahk_id %this_id%
         else
@@ -445,7 +455,7 @@ GoWhale(opt)
         {
             WinActivate, ahk_id %this_id%
             Sleep, 100
-            Send, ^%opt% ; opt∞° 1¿Ã∏È Ctrl+1
+            Send, ^%opt% ; optÍ∞Ä 1Ïù¥Î©¥ Ctrl+1
             Sleep, 100
         }
         return
@@ -473,7 +483,7 @@ GoChrome(opt)
         {
             WinActivate, ahk_id %this_id%
             Sleep, 100
-            Send, ^%opt% ; opt∞° 1¿Ã∏È Ctrl+1
+            Send, ^%opt% ; optÍ∞Ä 1Ïù¥Î©¥ Ctrl+1
             Sleep, 100
         }
         return
@@ -490,7 +500,7 @@ GoEdge(opt)
         {
             WinActivate, ahk_id %this_id%
             Sleep, 100
-            Send, ^%opt% ; opt∞° 1¿Ã∏È Ctrl+1
+            Send, ^%opt% ; optÍ∞Ä 1Ïù¥Î©¥ Ctrl+1
             Sleep, 100
         }
         return
@@ -499,7 +509,7 @@ GoEdge(opt)
 }
 GoTab(TargetTitle)
 {
-;  DetectHiddenWindows, On ; º˚∞‹¡¯ √¢µµ ∞®¡ˆ«œµµ∑œ º≥¡§
+;  DetectHiddenWindows, On ; Ïà®Í≤®ÏßÑ Ï∞ΩÎèÑ Í∞êÏßÄÌïòÎèÑÎ°ù ÏÑ§Ï†ï
 ;   Chrome
   TabCount := 0
   Loop, % WinExist("Chrome")
@@ -510,11 +520,11 @@ GoTab(TargetTitle)
     {
       ControlFocus, Chrome_RenderWidgetHostHWND%A_Index%, Chrome
       WinActivate, Chrome
-      break ; ø¯«œ¥¬ ≈«¿ª √£æ“¿∏∏È ∑Á«¡ ¡æ∑·
+      break ; ÏõêÌïòÎäî ÌÉ≠ÏùÑ Ï∞æÏïòÏúºÎ©¥ Î£®ÌîÑ Ï¢ÖÎ£å
     }
   }
   ; Edge
-;  If TabCount = 0 ; Chromeø°º≠ ∏¯√£æ“¿∏∏È Edgeø°º≠ √£±‚
+;  If TabCount = 0 ; ChromeÏóêÏÑú Î™ªÏ∞æÏïòÏúºÎ©¥ EdgeÏóêÏÑú Ï∞æÍ∏∞
 ;  {
 ;    Loop, % WinExist("ahk_exe msedge.exe")
 ;    {
@@ -524,26 +534,28 @@ GoTab(TargetTitle)
 ;      {
 ;        ControlFocus, Chrome_RenderWidgetHostHWND%A_Index%, ahk_exe msedge.exe
 ;        WinActivate, ahk_class msedge
-;        break ; ø¯«œ¥¬ ≈«¿ª √£æ“¿∏∏È ∑Á«¡ ¡æ∑·
+;        break ; ÏõêÌïòÎäî ÌÉ≠ÏùÑ Ï∞æÏïòÏúºÎ©¥ Î£®ÌîÑ Ï¢ÖÎ£å
 ;      }
 ;    }
 ;  }
-;  DetectHiddenWindows, Off ; º˚∞‹¡¯ √¢ ∞®¡ˆ º≥¡§ «ÿ¡¶
+;  DetectHiddenWindows, Off ; Ïà®Í≤®ÏßÑ Ï∞Ω Í∞êÏßÄ ÏÑ§Ï†ï Ìï¥Ï†ú
   if TabCount = 0
-    MsgBox, 48, √£±‚ Ω«∆–, "%TargetTitle%"¿ª(∏¶) ∆˜«‘«œ¥¬ ≈«¿ª √£¿ª ºˆ æ¯Ω¿¥œ¥Ÿ.
+    MsgBox, 48, Ï∞æÍ∏∞ Ïã§Ìå®, "%TargetTitle%"ÏùÑ(Î•º) Ìè¨Ìï®ÌïòÎäî ÌÉ≠ÏùÑ Ï∞æÏùÑ Ïàò ÏóÜÏäµÎãàÎã§.
   return
 }
-; --- º≥¡§ ---
-global LogFolder := "D:\Log"  ; ∑Œ±◊ ∆˙¥ı ∞Ê∑Œ
-global MaxFolders := 5  ; ∏ﬁ¥∫ø° «•Ω√«“ √÷¥Î ∆˙¥ı ∞≥ºˆ
-global MenuTitle := "√÷±Ÿ ∑Œ±◊ ∆˙¥ı º±≈√"  ; ∏ﬁ¥∫ ¡¶∏Ò
+; ===================================================================================================
+; GLOBAL VARIABLES & UTILITY FUNCTIONS
+; ===================================================================================================
+global LogFolder := "D:\Log"  ; Î°úÍ∑∏ Ìè¥Îçî Í≤ΩÎ°ú
+global MaxFolders := 5  ; Î©îÎâ¥Ïóê ÌëúÏãúÌï† ÏµúÎåÄ Ìè¥Îçî Í∞úÏàò
+global MenuTitle := "ÏµúÍ∑º Î°úÍ∑∏ Ìè¥Îçî ÏÑ†ÌÉù"  ; Î©îÎâ¥ Ï†úÎ™©
 global FolderPaths
 GetRecentFolders(FolderPath, MaxCount)
 {
 	FolderPath := "D:\Log"
   if !FileExist(FolderPath)
   {
-	MsgBox, Log ∆˙¥ı∞° æ¯¿Ω
+	MsgBox, Log Ìè¥ÎçîÍ∞Ä ÏóÜÏùå
     return ""
   }
   FileList := ""
@@ -551,7 +563,7 @@ GetRecentFolders(FolderPath, MaxCount)
   {
     FileList .= A_LoopFileLongPath . "|" . A_LoopFileTimeModified . "`n"
   }
-  ; √÷Ω≈º¯ ¡§∑ƒ
+  ; ÏµúÏã†Ïàú Ï†ïÎ†¨
   Sort, FileList, R D|
   OutputList := ""
   Loop, Parse, FileList, `n
@@ -567,10 +579,10 @@ GetRecentFolders(FolderPath, MaxCount)
 }
 ShowRecentLogFolders(logDir := "D:\Log", maxCount := 30)
 {
-    ; ∏ﬁ¥∫ √ ±‚»≠
+    ; Î©îÎâ¥ Ï¥àÍ∏∞Ìôî
     Menu, RecentFolders, Add, __dummy__, DummyHandler
     Menu, RecentFolders, DeleteAll
-    ; ∆˙¥ı ∞°¡Æø¿±‚
+    ; Ìè¥Îçî Í∞ÄÏ†∏Ïò§Í∏∞
     count := 0
     Loop, %logDir%\*, 2  ; 2 = Directory only
     {
@@ -581,7 +593,7 @@ ShowRecentLogFolders(logDir := "D:\Log", maxCount := 30)
         Menu, RecentFolders, Add, %displayName%, OpenRecentFolder
         count++
     }
-    ; ∏ﬁ¥∫ ∂ÁøÏ±‚
+    ; Î©îÎâ¥ ÎùÑÏö∞Í∏∞
     global __RecentFolderRoot := logDir
     Menu, RecentFolders, Show
     return
@@ -599,37 +611,37 @@ DummyFunction() {
 }
 GoToFolder() {
   ;~ LinuxPath := ConvertToLinuxPath(A_ThisMenuItem)
-	IfExist, D:\Log\%A_ThisMenuItem%\sdcard\EMLog  ; EMLog ∆˙¥ı∞° ¿÷¥¬¡ˆ »Æ¿Œ
+	IfExist, D:\Log\%A_ThisMenuItem%\sdcard\EMLog  ; EMLog Ìè¥ÎçîÍ∞Ä ÏûàÎäîÏßÄ ÌôïÏù∏
 		sendInput cd %A_ThisMenuItem%/sdcard/EMLog/main{Enter}
 	Else
 		sendInput cd %A_ThisMenuItem%/sdcard/WTLog/main{Enter}
   return
 }
 ConvertToLinuxPath(winPath) {
-  drive := SubStr(winPath, 1, 1)  ; µÂ∂Û¿Ã∫Í πÆ¿⁄ √ﬂ√‚
-  drive := Format("{:L}", drive)  ; º“πÆ¿⁄∑Œ ∫Ø»Ø
-  rest := SubStr(winPath, 3)  ; µÂ∂Û¿Ã∫Í πÆ¿⁄ ¿Ã»ƒ ∞Ê∑Œ
-  StringReplace, rest, rest, \, /, All  ; πÈΩΩ∑°Ω√∏¶ ΩΩ∑°Ω√∑Œ ∫Ø∞Ê
+  drive := SubStr(winPath, 1, 1)  ; ÎìúÎùºÏù¥Î∏å Î¨∏Ïûê Ï∂îÏ∂ú
+  drive := Format("{:L}", drive)  ; ÏÜåÎ¨∏ÏûêÎ°ú Î≥ÄÌôò
+  rest := SubStr(winPath, 3)  ; ÎìúÎùºÏù¥Î∏å Î¨∏Ïûê Ïù¥ÌõÑ Í≤ΩÎ°ú
+  StringReplace, rest, rest, \, /, All  ; Î∞±Ïä¨ÎûòÏãúÎ•º Ïä¨ÎûòÏãúÎ°ú Î≥ÄÍ≤Ω
   return "/mnt/" . drive . rest
 }
 GoRecentlyFolder()
 {
-    ; Python Ω««‡«œø© √÷±Ÿ ∆˙¥ı ∏Ò∑œ ∞°¡Æø¿±‚
+    ; Python Ïã§ÌñâÌïòÏó¨ ÏµúÍ∑º Ìè¥Îçî Î™©Î°ù Í∞ÄÏ†∏Ïò§Í∏∞
     RunWait, %ComSpec% /c python "E:\GitHub\Python\GotoRecentlyFolder.py", , Hide
-    ; √‚∑¬µ» ∆˙¥ı ∏Ò∑œ ¿–±‚E:\GitHub\Python\GotoRecentlyFolder.pynE:\GitHub\Python\GotoRecentlyFolder.pyE:\GitHub\Python\GotoRecentlyFolder.py
+    ; Ï∂úÎ†•Îêú Ìè¥Îçî Î™©Î°ù ÏùΩÍ∏∞E:\GitHub\Python\GotoRecentlyFolder.pynE:\GitHub\Python\GotoRecentlyFolder.pyE:\GitHub\Python\GotoRecentlyFolder.py
     FileRead, folderList, %A_Temp%\folders.txt
     StringSplit, lines, folderList, :
-    ; ∏ﬁ¥∫ ªı∑Œ ∏∏µÈ±‚ (¿Ã¿¸ ∏ﬁ¥∫ ¡ˆøÏ¡ˆ æ ∞Ì ªı∑Œ µ§±‚)
-    Menu, RecentFolders, Add, [√÷±Ÿ ∆˙¥ı º±≈√], dummyHandler
-    Menu, RecentFolders, Disable, [√÷±Ÿ ∆˙¥ı º±≈√]
-;     ±‚¡∏ «◊∏Ò¿Ã ¿÷¥Ÿ∏È ¡¶∞≈
+    ; Î©îÎâ¥ ÏÉàÎ°ú ÎßåÎì§Í∏∞ (Ïù¥Ï†Ñ Î©îÎâ¥ ÏßÄÏö∞ÏßÄ ÏïäÍ≥† ÏÉàÎ°ú ÎçÆÍ∏∞)
+    Menu, RecentFolders, Add, [ÏµúÍ∑º Ìè¥Îçî ÏÑ†ÌÉù], dummyHandler
+    Menu, RecentFolders, Disable, [ÏµúÍ∑º Ìè¥Îçî ÏÑ†ÌÉù]
+;     Í∏∞Ï°¥ Ìï≠Î™©Ïù¥ ÏûàÎã§Î©¥ Ï†úÍ±∞
 ;    Loop
 ;    {
 ;        Menu, RecentFolders, Delete, %A_Index%
 ;        if ErrorLevel
 ;            break
 ;    }
-    ; √÷±Ÿ ∆˙¥ı «◊∏Ò √ﬂ∞°
+    ; ÏµúÍ∑º Ìè¥Îçî Ìï≠Î™© Ï∂îÍ∞Ä
     Loop, %lines0%
     {
         item := lines%A_Index%
@@ -650,53 +662,15 @@ OpenFolder:
 		SendInput, cd %SelectedPath%\sdcard\EMLog\main
 	}
 return
-;#Numpad0::
-;	GroupAdd, AndroidStudioGroup, ahk_exe studio64.exe
-;	If WinActive("ahk_exe studio64.exe")
-;		GroupActivate, AndroidStudioGroup
-;	else
-;		WinActivate ahk_exe studio64.exe
-	;GoAndroidStudio()
-;	return
-;#Numpad2::
-;	if WinActivate, Logcat - U100
-;	{
-;		msgbox, "Hello"
-;		WinHide, Logcat - U100
-;	}
-;	else
-;		WinActivate, Logcat - U100
-;	return
-;#Numpad4::
-;  WinActivate, ahk_exe notepad++.exe
-;  return
-;#Numpad5::
-	 ;Autohotkey script to auto-connect to SSH using Teraterm
-	 ;º≥¡§
-;	ip := "192.168.3.105"  ; IP ¡÷º“∏¶ ¿‘∑¬«œººø‰
-;	username := "root"  ; SSH ªÁøÎ¿⁄ ¿Ã∏ß
-;	password := "root"  ; SSH ∫Òπ–π¯»£
-;	teraterm_path := "C:\Program Files (x86)\teraterm\ttermpro.exe"  ; Teraterm ∞Ê∑Œ
-	 ;Teraterm Ω««‡ π◊ ø¨∞·
-;	Run, %teraterm_path% /ssh %ip%, , , pid
-;	WinWait, ahk_pid %pid%
-	 ;√¢¿Ã »∞º∫»≠µ… ∂ß±Ó¡ˆ ¥Î±‚
-;	WinActivate, ahk_pid %pid%
-;	 ∑Œ±◊¿Œ ¡§∫∏ ¿‘∑¬
-;	Sleep, 1000  ; Teraterm¿Ã øœ¿¸»˜ ∑ŒµÂµ«µµ∑œ ¿·Ω√ ¥Î±‚
-;	Send, %username%{Enter}
-;	Sleep, 500  ; æ‡∞£¿« ¥Î±‚ Ω√∞£ √ﬂ∞°
-;	Send, %password%{Enter}
-;~ AppsKey & Numpad1::
-	;~ ;sendInput ls -r logcat.0* logcat | xargs grep
-	;~ sendInput cat sdcard/WTLog/main/main.log.01 sdcard/WTLog/main/main.log | grep -E "logcatlog|EMLauncher:|EMAudioService:|MicomService:|DataService:|ScreenService:|ActivityManager:|SystemService:" | ~/Build_Desktop/LogColor
-	;~ return
-:*:date..::  ; This hotstring replaces "]d" with the current date and time via the commands below.
-FormatTime, CurrentDateDate,%A_Now%, yyyy≥‚ Mø˘ d¿œ  ; It will look like 9/1/2005 3:53 PM
+; ===================================================================================================
+; HOTSTRINGS & TEXT EXPANSION
+; ===================================================================================================
+:*:date..::
+FormatTime, CurrentDateDate,%A_Now%, yyyyÎÖÑ MÏõî dÏùº  ; It will look like 9/1/2005 3:53 PM
 SendInput %CurrentDateDate%
 return
-:*:time..::  ; This hotstring replaces "]d" with the current date and time via the commands below.
-FormatTime, CurrentDateTime, %A_Now%, yyyy≥‚ Mø˘ d¿œ h:mm ; It will look like 9/1/2005 3:53 PM
+:*:time..::
+FormatTime, CurrentDateTime, %A_Now%, yyyyÎÖÑ MÏõî dÏùº h:mm ; It will look like 9/1/2005 3:53 PM
 SendInput %CurrentDateTime%
 return
 :*:em..::adb shell am broadcast -a action.ematsoft.test --es emdata --es value
@@ -707,173 +681,29 @@ return
 :*:log..::EMLOG.i("onChange: " + EMData.findValue(key) + ", " + s);
 :*:..con::cat logcat.050 logcat.049 logcat.048 logcat.047 logcat.046 logcat.045 logcat.044 logcat.043 logcat.042 logcat.041 logcat.040 logcat.039 logcat.038 logcat.037 logcat.036 logcat.035 logcat.034 logcat.033 logcat.032 logcat.031 logcat.030 logcat.029 logcat.028 logcat.027 logcat.026 logcat.025 logcat.024 logcat.023 logcat.022 logcat.021 logcat.020 logcat.019 logcat.018 logcat.017 logcat.016 logcat.015 logcat.014 logcat.013 logcat.012 logcat.011 logcat.010 logcat.009 logcat.008 logcat.007 logcat.006 logcat.005 logcat.004 logcat.003 logcat.002 logcat.001 logcat >
 :*:..emtext::com.ematsoft.controllib.control.EMTextView{Enter}android:layout_marginLeft="px"{Enter}android:layout_marginTop="px"{Enter}android:layout_width="px"{Enter}android:layout_height="px"{Enter}style="@style/text_regular"{Enter}android:gravity="center"{Enter}android:textSize="px"{Enter}android:textColor="@color/text_color_normal_ff70"{Enter}android:text=""{Enter}/>
-;:*:hi..::
-;	msgbox "æ»≥Á"
-;     «ˆ¿Á ≈¨∏≥∫∏µÂ ≥ªøÎ¿ª πÈæ˜
-;    ClipboardBackup := ClipboardAll
-;    Clipboard := ""  ; ≈¨∏≥∫∏µÂ∏¶ ∫Òøˆº≠ ¡ÿ∫Ò
-;    ClipWait, 0.5  ; ≈¨∏≥∫∏µÂ∞° ∫Òøˆ¡˙ ∂ß±Ó¡ˆ ¿·Ω√ ¥Î±‚
-;     ≈ÿΩ∫∆Æ∏¶ ≈¨∏≥∫∏µÂø° ∫πªÁ«œ∞Ì ∫Ÿø©≥÷±‚
-;    Clipboard := "Hello.`n¿Ã∏Àº“«¡∆Æ ¿”ø¯±‘¿‘¥œ¥Ÿ.`n"
-;    ClipWait, 0.5  ; ≈¨∏≥∫∏µÂø° ≥ªøÎ¿Ã º≥¡§µ… ∂ß±Ó¡ˆ ¿·Ω√ ¥Î±‚
-;     ∫Ÿø©≥÷±‚ (Ctrl+V)
-;    Send, ^v
-;    Sleep, 50  ; ∫Ÿø©≥÷±‚ »ƒ ¿·±Ò ¥Î±‚
-;     ø¯∑° ≈¨∏≥∫∏µÂ ≥ªøÎ ∫πø¯
-;    Clipboard := ClipboardBackup
-;    ClipboardBackup := ""  ; ¿”Ω√ ≈¨∏≥∫∏µÂ ≥ªøÎ ¡ˆøÏ±‚
-;return
-:*:hi..::æ»≥Á«œººø‰`n¿Ã∏Àº“«¡∆Æ ¿”ø¯±‘¿‘¥œ¥Ÿ.`n
-::(1)::®Á
-::(2)::®Ë
-::(3)::®È
-::(4)::®Í
-::(5)::®Î
-::(6)::®Ï
-::(7)::®Ì
-::(8)::®Ó
-::(9)::®Ô
-::(10)::®
+:*:hi..::ÏïàÎÖïÌïòÏÑ∏Ïöî`nÏù¥Îß∑ÏÜåÌîÑÌä∏ ÏûÑÏõêÍ∑úÏûÖÎãàÎã§.`n
+:*:„Öá..::ÏïàÎÖïÌïòÏÑ∏Ïöî`nÏù¥Îß∑ÏÜåÌîÑÌä∏ ÏûÑÏõêÍ∑úÏûÖÎãàÎã§.`n
+:*:(1))::‚ë†
+:*:(2))::‚ë°
+:*:(3))::‚ë¢
+:*:(4))::‚ë£
+:*:(5))::‚ë§
+:*:(6))::‚ë•
+:*:(7))::‚ë¶
+:*:(8))::‚ëß
+:*:(9))::‚ë®
+:*:(10))::‚ë©
 
-;!3::
-;	switch (IsTeraTerm())
-;	{
-;		case 1:
-;		sendInput cd /usr/bin/C300{Enter}
-;		case 2:
-;		sendInput C300Log_All.bat messages
-;	}
-;return
-;!4::
-;	switch (IsTeraTerm())
-;	{
-;		case 1:
-;		sendInput cat /reserved1/model-release{Enter}
-;		case 2:
-;		sendInput C300Log_Normal_carplay.bat messages
-;	}
-;return
-;!5::
-;	sendInput cd sdcard{Enter}
-;	sendInput logcat -c{Enter}
-;	sendInput logcat -v time | grep EMS_TPEG > ems_log{Enter}
-;return
-;!0::
-;	switch (IsTeraTerm())
-;	{
-;		case 1:
-;			sendInput touch /tmp/system_started{Enter}
-;			sendInput killall C300SystemService{Enter}
-;			return
-;		case 2:
-;		{
-;		sendInput ssh-keygen -R 192.168.10.95 {Enter}
-;		sendInput ssh-keygen -R 192.168.10.96 {Enter}
-;		}
-;	}
-;return
-;!Numpad0::
-;	sendInput ls -t *.tar.gz | head -1 | xargs tar xfz{Enter}
-;return
-;!Numpad1::
-;	switch (IsTeraTerm())
-;	{
-;		case 2:
-;			sendInput adb shell cat /sdcard/WTLog/main/main.log | grep
-;			return
-;		case 1:
-;			sendInput tail -F /var/log/messages | grep
-;			return
-;	}
-;return
-;!Numpad2::
-;switch (IsTeraTerm())
-;	{
-;		case 2:
-;			sendInput adb shell cat /sdcard/WTLog/main/main.log.01 /sdcard/WTLog/main/main.log | grep
-;			return
-;		case 1:
-;			sendInput cat /var/log/messages | grep
-;			return
-;	}
-;return
-;!Numpad3::
-;	sendInput cat logdata_full.u100 | grep -E "logcatlog|EMLOG|EMLauncher:|EMAudioService:|MicomService:|DataService:|ScreenService:|SystemService:" | ~/Build_Desktop/LogColor
-;return
-;!Numpad4::
-;	sendInput adb logcat -G 64M
-;return
-;!Numpad7::
-;	sendInput adb shell cat /sdcard/WTLog/main/main.log.01 /sdcard/WTLog/main/main.log | grep -a -E "EMLOG|logcatlog|EMLauncher:|EMAudioService:|MicomService:|DataService:|ScreenService:|SystemService:" | ~/Build_Desktop/LogColor
-;return
-;^Numpad0::
-;	sendInput adb connect 192.168.3.3
-;return
-;^Numpad1::
-;  sendInput adb shell killall com.ematsoft.dataservice{Enter}
-;	sendInput adb shell am start-foreground-service com.ematsoft.dataservice/.EMDataService{Enter}
-;return
-;^Numpad2::
-;  sendInput adb shell killall com.ematsoft.screenservice{Enter}
-;	sendInput adb shell am start-foreground-service com.ematsoft.screenservice/.EMScreenService{Enter}
-;return
-;^Numpad3::
-;  sendInput adb shell killall com.ematsoft.micomservice{Enter}
-;	sendInput adb shell am start-foreground-service com.ematsoft.micomservice/.EMMicomService{Enter}
-;return
-;^Numpad4::
-;  sendInput adb shell killall com.ematsoft.systemservice{Enter}
-;	sendInput adb shell am start-foreground-service com.ematsoft.systemservice/.EMSystemService{Enter}
-;return
-;^Numpad5::
-;  sendInput adb shell killall com.ematsoft.audioservice{Enter}
-;	sendInput adb shell am start-foreground-service com.ematsoft.audioservice/.EMAudioService{Enter}
-;return
-;^Numpad6::
-;  sendInput adb shell killall com.ematsoft.clusterservice{Enter}
-;  sendInput adb shell am start-foreground-service com.ematsoft.clusterservice/.EMClusterService{Enter}
-;	Run "C:\Program Files (x86)\teraterm\ttermpro.exe" /C=37 /SPEED=114200
-;return
-;^Numpad4::
-;	FormatTime, TimeString
-;	send %TimeString%.
-;return
-;~ #Numpad7::
-    ;~ send scp wglim@192.168.3.225:/home/wglim/batch/wificon.sh /reserved1/{Enter}
-    ;~ sleep 1000
-	;~ sendInput yes{Enter}
-    ;~ sleep 1000
-	;~ sendInput emat{Enter}
-;~ return
-;~ ;
-;^Numpad8::
-;    send scp wglim@192.168.3.225:/home/wglim/batch/wificon.sh /reserved1/{Enter}
-;	sleep 500
-;	sendInput emat{Enter}
-;	sleep 500
-;	sendInput scp wglim@192.168.3.225:/home/wglim/build/Y450SA_32bit/LogColor/LogColor /usr/bin/C300/{Enter}
-;	sleep 500
-;	sendInput emat{Enter}
-;	sleep 500
-;	sendInput scp wglim@192.168.3.225:/home/wglim/batch/s_run.sh /lib/systemd/scripts/{Enter}
-;	sleep 500
-;	sendInput emat{Enter}
-;return
-;
-;~ #Numpad9::
-	;~ send scp wglim@192.168.3.195:/home/wglim/batch/wificon.sh /reserved1/{Enter}
-	;~ sleep 500
-	;~ sendInput emat{Enter}
-	;~ sleep 500
-	;~ sendInput scp wglim@192.168.3.195:/home/wglim/build/Y450AVN_64bit/LogColor/LogColor /usr/bin/C300/{Enter}
-	;~ sleep 500
-	;~ sendInput emat{Enter}
-	;~ sleep 500
-	;~ sendInput scp wglim@192.168.3.195:/home/wglim/batch/s_run.sh /lib/systemd/scripts/{Enter}
-	;~ sleep 500
-	;~ sendInput emat{Enter}
-	;~ sleep 500
-	;~ sendInput scp wglim@192.168.3.195:/home/wglim/batch/*.service /lib/systemd/system/{Enter}
-	;~ sleep 500
-	;~ sendInput emat{Enter}
-;~ return
+; ===================================================================================================
+; CLIPBOARD UTILITIES
+; ===================================================================================================
+; ÌÅ¥Î¶ΩÎ≥¥Îìú ÎÇ¥Ïö©ÏùÑ ÏùºÎ∞ò ÌÖçÏä§Ìä∏Î°ú Î∂ôÏó¨ÎÑ£Í∏∞ (ÏÑúÏãù Ï†úÍ±∞)
+^+V::
+    ClipSaved := ClipboardAll
+    Clipboard := Clipboard  ; ÌÅ¥Î¶ΩÎ≥¥Îìú ÎÇ¥Ïö©ÏùÑ Îã§Ïãú ÏÑ§Ï†ïÌïòÏó¨ ÏÑúÏãù Ï†úÍ±∞
+    Send, ^v
+    Sleep, 50
+    Clipboard := ClipSaved
+    ClipSaved := ""
+return
+

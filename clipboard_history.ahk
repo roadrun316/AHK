@@ -1,43 +1,53 @@
-#SingleInstance Force
+ï»¿#SingleInstance Force
 #NoEnv
 SendMode Input
 SetWorkingDir %A_ScriptDir%
 
-; Å¬¸³º¸µå È÷½ºÅä¸® ¼³Á¤
-MaxHistoryItems := 20  ; ÃÖ´ë È÷½ºÅä¸® °³¼ö
-ClipboardHistory := []  ; È÷½ºÅä¸® ¹è¿­
-HistoryFile := A_ScriptDir . "\clipboard_history.txt"  ; È÷½ºÅä¸® ÆÄÀÏ
+; í´ë¦½ë³´ë“œ íˆìŠ¤í† ë¦¬ ì„¤ì •
+MaxHistoryItems := 20  ; ìµœëŒ€ íˆìŠ¤í† ë¦¬ ê°œìˆ˜
+ClipboardHistory := []  ; íˆìŠ¤í† ë¦¬ ë°°ì—´
+HistoryFile := A_ScriptDir . "\clipboard_history.txt"  ; íˆìŠ¤í† ë¦¬ íŒŒì¼
 
-; ½ºÅ©¸³Æ® ½ÃÀÛ ½Ã È÷½ºÅä¸® ·Îµå
+; ìŠ¤í¬ë¦½íŠ¸ ì‹œì‘ ì‹œ íˆìŠ¤í† ë¦¬ ë¡œë“œ
 LoadHistoryFromFile()
 
-; Win+C: º¹»çÇÏ°í È÷½ºÅä¸®¿¡ ÀúÀå
+; Win+C: ë³µì‚¬í•˜ê³  íˆìŠ¤í† ë¦¬ì— ì €ì¥
 ^F24::
-    ; ±âº» º¹»ç ½ÇÇà (Ctrl+C)
+    ; ê¸°ë³¸ ë³µì‚¬ ì‹¤í–‰ (Ctrl+C)
     Send ^c
-    Sleep 100  ; º¹»ç ¿Ï·á ´ë±â
+    Sleep 100  ; ë³µì‚¬ ì™„ë£Œ ëŒ€ê¸°
     
-    ; Å¬¸³º¸µå ³»¿ëÀ» È÷½ºÅä¸®¿¡ Ãß°¡
+    ; í´ë¦½ë³´ë“œ ë‚´ìš©ì„ íˆìŠ¤í† ë¦¬ì— ì¶”ê°€
     AddToHistory(Clipboard)
     
-    ; »óÅÂ Ç¥½Ã
-    ShowTooltip("º¹»çµÊ: " . GetPreview(Clipboard), 1500)
+    ; ìƒíƒœ í‘œì‹œ
+    ShowTooltip("ë³µì‚¬ë¨: " . GetPreview(Clipboard), 1500)
 return
 
-; Win+Z: È÷½ºÅä¸® ¼±ÅÃ ¸Ş´º Ç¥½Ã
+; Win+Z: íˆìŠ¤í† ë¦¬ ì„ íƒ ë©”ë‰´ í‘œì‹œ
 F24::
     ShowHistoryMenu()
 return
 
-; È÷½ºÅä¸®¿¡ »õ Ç×¸ñ Ãß°¡
+; Ctrl+Delete: ì‚­ì œ ë©”ë‰´ í‘œì‹œ
+;^Delete::
+;    ShowDeleteMenu()
+;return
+
+; Shift+Delete: ìµœê·¼ í•­ëª© ë°”ë¡œ ì‚­ì œ
+;+Delete::
+;    DeleteLastUsedItem()
+;return
+
+; íˆìŠ¤í† ë¦¬ì— ìƒˆ í•­ëª© ì¶”ê°€
 AddToHistory(NewItem) {
     global ClipboardHistory, MaxHistoryItems
     
-    ; ºó ³»¿ëÀÌ¸é Ãß°¡ÇÏÁö ¾ÊÀ½
+    ; ë¹ˆ ë‚´ìš©ì´ë©´ ì¶”ê°€í•˜ì§€ ì•ŠìŒ
     if (StrLen(Trim(NewItem)) = 0)
         return
     
-    ; Áßº¹ Á¦°Å: ÀÌ¹Ì Á¸ÀçÇÏ¸é ÇØ´ç Ç×¸ñÀ» ¸Ç ¾ÕÀ¸·Î ÀÌµ¿
+    ; ì¤‘ë³µ ì œê±°: ì´ë¯¸ ì¡´ì¬í•˜ë©´ í•´ë‹¹ í•­ëª©ì„ ë§¨ ì•ìœ¼ë¡œ ì´ë™
     for index, item in ClipboardHistory {
         if (item = NewItem) {
             ClipboardHistory.RemoveAt(index)
@@ -45,108 +55,184 @@ AddToHistory(NewItem) {
         }
     }
     
-    ; ¸Ç ¾Õ¿¡ »õ Ç×¸ñ Ãß°¡
+    ; ë§¨ ì•ì— ìƒˆ í•­ëª© ì¶”ê°€
     ClipboardHistory.InsertAt(1, NewItem)
     
-    ; ÃÖ´ë °³¼ö ÃÊ°ú ½Ã ¸¶Áö¸· Ç×¸ñ Á¦°Å
+    ; ìµœëŒ€ ê°œìˆ˜ ì´ˆê³¼ ì‹œ ë§ˆì§€ë§‰ í•­ëª© ì œê±°
     if (ClipboardHistory.MaxIndex() > MaxHistoryItems) {
         ClipboardHistory.RemoveAt(MaxHistoryItems + 1)
     }
     
-    ; È÷½ºÅä¸® ÆÄÀÏ¿¡ ÀúÀå
+    ; íˆìŠ¤í† ë¦¬ íŒŒì¼ì— ì €ì¥
     SaveHistoryToFile()
 }
 
-; È÷½ºÅä¸® ¸Ş´º Ç¥½Ã
+; íˆìŠ¤í† ë¦¬ ë©”ë‰´ í‘œì‹œ
 ShowHistoryMenu() {
     global ClipboardHistory
     
-    ; ±âÁ¸ ¸Ş´º »èÁ¦
+    ; ê¸°ì¡´ ë©”ë‰´ ì‚­ì œ
     Menu, ClipHistoryMenu, Add, Temp, DummyFunction
     Menu, ClipHistoryMenu, DeleteAll
     
-    ; È÷½ºÅä¸®°¡ ºñ¾îÀÖÀ¸¸é ¸Ş½ÃÁö Ç¥½Ã
+    ; íˆìŠ¤í† ë¦¬ê°€ ë¹„ì–´ìˆìœ¼ë©´ ë©”ì‹œì§€ í‘œì‹œ
     if (ClipboardHistory.MaxIndex() = 0 || ClipboardHistory.MaxIndex() = "") {
-        Menu, ClipHistoryMenu, Add, (È÷½ºÅä¸® ¾øÀ½), DummyFunction
-        Menu, ClipHistoryMenu, Disable, (È÷½ºÅä¸® ¾øÀ½)
+        Menu, ClipHistoryMenu, Add, (íˆìŠ¤í† ë¦¬ ì—†ìŒ), DummyFunction
+        Menu, ClipHistoryMenu, Disable, (íˆìŠ¤í† ë¦¬ ì—†ìŒ)
     } else {
-        ; È÷½ºÅä¸® Ç×¸ñµéÀ» ¸Ş´º¿¡ Ãß°¡
+        ; íˆìŠ¤í† ë¦¬ í•­ëª©ë“¤ì„ ë©”ë‰´ì— ì¶”ê°€
         for index, item in ClipboardHistory {
             preview := GetPreview(item)
             menuText := index . ". " . preview
             Menu, ClipHistoryMenu, Add, %menuText%, PasteFromHistory
         }
         
-        ; ±¸ºĞ¼±°ú °ü¸® ¿É¼Ç Ãß°¡
+        ; êµ¬ë¶„ì„ ê³¼ ê´€ë¦¬ ì˜µì…˜ ì¶”ê°€
         Menu, ClipHistoryMenu, Add,
-        Menu, ClipHistoryMenu, Add, È÷½ºÅä¸® Áö¿ì±â, ClearHistory
+        Menu, ClipHistoryMenu, Add, ê°œë³„ ì‚­ì œ ë©”ë‰´, ShowDeleteMenu
+        Menu, ClipHistoryMenu, Add, íˆìŠ¤í† ë¦¬ ì§€ìš°ê¸°, ClearHistory
     }
     
-    ; ¸Ş´º Ç¥½Ã
+    ; ë©”ë‰´ í‘œì‹œ
     Menu, ClipHistoryMenu, Show
 }
 
-; È÷½ºÅä¸®¿¡¼­ ¼±ÅÃÇÑ Ç×¸ñ ºÙ¿©³Ö±â
+; ì‚­ì œ ì „ìš© ë©”ë‰´ í‘œì‹œ
+ShowDeleteMenu() {
+    global ClipboardHistory
+    
+    ; ê¸°ì¡´ ë©”ë‰´ ì‚­ì œ
+    Menu, ClipDeleteMenu, Add, Temp, DummyFunction
+    Menu, ClipDeleteMenu, DeleteAll
+    
+    ; íˆìŠ¤í† ë¦¬ê°€ ë¹„ì–´ìˆìœ¼ë©´ ë©”ì‹œì§€ í‘œì‹œ
+    if (ClipboardHistory.MaxIndex() = 0 || ClipboardHistory.MaxIndex() = "") {
+        Menu, ClipDeleteMenu, Add, (ì‚­ì œí•  í•­ëª© ì—†ìŒ), DummyFunction
+        Menu, ClipDeleteMenu, Disable, (ì‚­ì œí•  í•­ëª© ì—†ìŒ)
+    } else {
+        ; ì‚­ì œí•  í•­ëª©ë“¤ì„ ë©”ë‰´ì— ì¶”ê°€
+        for index, item in ClipboardHistory {
+            preview := GetPreview(item)
+            deleteText := "ì‚­ì œ: " . index . ". " . preview
+            Menu, ClipDeleteMenu, Add, %deleteText%, DeleteHistoryItem
+        }
+        
+        ; êµ¬ë¶„ì„ ê³¼ ì·¨ì†Œ ì˜µì…˜
+        Menu, ClipDeleteMenu, Add,
+        Menu, ClipDeleteMenu, Add, ì·¨ì†Œ, DummyFunction
+    }
+    
+    ; ë©”ë‰´ í‘œì‹œ
+    Menu, ClipDeleteMenu, Show
+}
+
+; íˆìŠ¤í† ë¦¬ì—ì„œ ì„ íƒí•œ í•­ëª© ë¶™ì—¬ë„£ê¸°
 PasteFromHistory() {
     global ClipboardHistory
     
-    ; ¸Ş´º ÅØ½ºÆ®¿¡¼­ ÀÎµ¦½º ÃßÃâ (1. preview -> 1)
+    ; ë©”ë‰´ í…ìŠ¤íŠ¸ì—ì„œ ì¸ë±ìŠ¤ ì¶”ì¶œ (1. preview -> 1)
     RegExMatch(A_ThisMenuItem, "^(\d+)\.", match)
     index := match1
     
     if (index > 0 && index <= ClipboardHistory.MaxIndex()) {
-        ; Å¬¸³º¸µå¿¡ ¼±ÅÃÇÑ Ç×¸ñ ¼³Á¤
+        ; í´ë¦½ë³´ë“œì— ì„ íƒí•œ í•­ëª© ì„¤ì •
         Clipboard := ClipboardHistory[index]
         Sleep 50
         
-        ; ºÙ¿©³Ö±â ½ÇÇà
+        ; ë¶™ì—¬ë„£ê¸° ì‹¤í–‰
         Send ^v
         
-        ; ¼±ÅÃÇÑ Ç×¸ñÀ» ¸Ç ¾ÕÀ¸·Î ÀÌµ¿ (ÃÖ±Ù »ç¿ë¼ø Á¤·Ä)
-        selectedItem := ClipboardHistory[index]
-        ClipboardHistory.RemoveAt(index)
-        ClipboardHistory.InsertAt(1, selectedItem)
-        SaveHistoryToFile()
+        ; ì„ íƒí•œ í•­ëª©ì„ ë§¨ ì•ìœ¼ë¡œ ì´ë™ (ìµœê·¼ ì‚¬ìš©ìˆœ ì •ë ¬)
+;        selectedItem := ClipboardHistory[index]
+;        ClipboardHistory.RemoveAt(index)
+;        ClipboardHistory.InsertAt(1, selectedItem)
+;        SaveHistoryToFile()
         
-        ; »óÅÂ Ç¥½Ã
-        ShowTooltip("ºÙ¿©³Ö±â: " . GetPreview(selectedItem), 1000)
+        ; ìƒíƒœ í‘œì‹œ
+        ShowTooltip("ë¶™ì—¬ë„£ê¸°: " . GetPreview(selectedItem), 1000)
     }
 }
 
-; È÷½ºÅä¸® Áö¿ì±â
+; ê°œë³„ íˆìŠ¤í† ë¦¬ í•­ëª© ì‚­ì œ
+DeleteHistoryItem() {
+    global ClipboardHistory
+    
+    ; ë©”ë‰´ í…ìŠ¤íŠ¸ì—ì„œ ì¸ë±ìŠ¤ ì¶”ì¶œ (ì‚­ì œ: 1. preview -> 1)
+    RegExMatch(A_ThisMenuItem, "ì‚­ì œ: (\d+)\.", match)
+    index := match1
+    
+    if (index > 0 && index <= ClipboardHistory.MaxIndex()) {
+        ; ì‚­ì œí•  í•­ëª©ì˜ ë¯¸ë¦¬ë³´ê¸°
+        itemPreview := GetPreview(ClipboardHistory[index])
+        
+        ; í™•ì¸ ë©”ì‹œì§€
+        MsgBox, 4, í™•ì¸, ë‹¤ìŒ í•­ëª©ì„ ì‚­ì œí•˜ì‹œê² ìŠµë‹ˆê¹Œ?`n`n"%itemPreview%"
+        IfMsgBox Yes
+        {
+            ; í•­ëª© ì‚­ì œ
+            ClipboardHistory.RemoveAt(index)
+            SaveHistoryToFile()
+            ShowTooltip("í•­ëª©ì´ ì‚­ì œë˜ì—ˆìŠµë‹ˆë‹¤", 1000)
+        }
+    }
+}
+
+; ìµœê·¼ ì‚¬ìš©í•œ í•­ëª© ì‚­ì œ (ì²« ë²ˆì§¸ í•­ëª©)
+DeleteLastUsedItem() {
+    global ClipboardHistory
+    
+    if (ClipboardHistory.MaxIndex() > 0) {
+        ; ì²« ë²ˆì§¸ í•­ëª©ì˜ ë¯¸ë¦¬ë³´ê¸°
+        itemPreview := GetPreview(ClipboardHistory[1])
+        
+        ; í™•ì¸ ë©”ì‹œì§€
+        MsgBox, 4, í™•ì¸, ìµœê·¼ ì‚¬ìš© í•­ëª©ì„ ì‚­ì œí•˜ì‹œê² ìŠµë‹ˆê¹Œ?`n`n"%itemPreview%"
+        IfMsgBox Yes
+        {
+            ; ì²« ë²ˆì§¸ í•­ëª© ì‚­ì œ
+            ClipboardHistory.RemoveAt(1)
+            SaveHistoryToFile()
+            ShowTooltip("ìµœê·¼ ì‚¬ìš© í•­ëª©ì´ ì‚­ì œë˜ì—ˆìŠµë‹ˆë‹¤", 1000)
+        }
+    } else {
+        ShowTooltip("ì‚­ì œí•  íˆìŠ¤í† ë¦¬ í•­ëª©ì´ ì—†ìŠµë‹ˆë‹¤", 1000)
+    }
+}
+
+; íˆìŠ¤í† ë¦¬ ì§€ìš°ê¸°
 ClearHistory() {
     global ClipboardHistory
     
-    MsgBox, 4, È®ÀÎ, Å¬¸³º¸µå È÷½ºÅä¸®¸¦ ¸ğµÎ Áö¿ì½Ã°Ú½À´Ï±î?
+    MsgBox, 4, í™•ì¸, í´ë¦½ë³´ë“œ íˆìŠ¤í† ë¦¬ë¥¼ ëª¨ë‘ ì§€ìš°ì‹œê² ìŠµë‹ˆê¹Œ?
     IfMsgBox Yes
     {
         ClipboardHistory := []
         SaveHistoryToFile()
-        ShowTooltip("È÷½ºÅä¸®°¡ Áö¿öÁ³½À´Ï´Ù", 1000)
+        ShowTooltip("íˆìŠ¤í† ë¦¬ê°€ ì§€ì›Œì¡ŒìŠµë‹ˆë‹¤", 1000)
     }
 }
 
-; ÅØ½ºÆ® ¹Ì¸®º¸±â »ı¼º (ÇÑ ÁÙ·Î Ãà¾à, ÃÖ´ë 60ÀÚ)
+; í…ìŠ¤íŠ¸ ë¯¸ë¦¬ë³´ê¸° ìƒì„± (í•œ ì¤„ë¡œ ì¶•ì•½, ìµœëŒ€ 60ì)
 GetPreview(text) {
-    ; ÁÙ¹Ù²Ş Á¦°ÅÇÏ°í °ø¹é Á¤¸®
+    ; ì¤„ë°”ê¿ˆ ì œê±°í•˜ê³  ê³µë°± ì •ë¦¬
     preview := RegExReplace(text, "\r?\n", " ")
     preview := RegExReplace(preview, "\s+", " ")
     preview := Trim(preview)
     
-    ; ±æÀÌ Á¦ÇÑ
+    ; ê¸¸ì´ ì œí•œ
     if (StrLen(preview) > 60) {
         preview := SubStr(preview, 1, 57) . "..."
     }
     
-    ; ºó ³»¿ë Ã³¸®
+    ; ë¹ˆ ë‚´ìš© ì²˜ë¦¬
     if (StrLen(preview) = 0) {
-        preview := "(ºó ³»¿ë)"
+        preview := "(ë¹ˆ ë‚´ìš©)"
     }
     
     return preview
 }
 
-; ÅøÆÁ Ç¥½Ã
+; íˆ´íŒ í‘œì‹œ
 ShowTooltip(message, duration := 1000) {
     ToolTip, %message%
     SetTimer, RemoveTooltip, -%duration%
@@ -156,23 +242,23 @@ RemoveTooltip:
     ToolTip
 return
 
-; È÷½ºÅä¸®¸¦ ÆÄÀÏ¿¡ ÀúÀå
+; íˆìŠ¤í† ë¦¬ë¥¼ íŒŒì¼ì— ì €ì¥
 SaveHistoryToFile() {
     global ClipboardHistory, HistoryFile
     
     FileDelete, %HistoryFile%
     
     for index, item in ClipboardHistory {
-        ; Æ¯¼ö ¹®ÀÚ Ã³¸®¸¦ À§ÇØ ±¸ºĞÀÚ »ç¿ë
-        encodedItem := StrReplace(item, "|", "£ü")  ; | ¹®ÀÚ¸¦ Àü°¢ ¹®ÀÚ·Î ´ëÃ¼
-        encodedItem := StrReplace(encodedItem, "`n", "£ün£ü")  ; ÁÙ¹Ù²Ş Ã³¸®
-        encodedItem := StrReplace(encodedItem, "`r", "£ür£ü")  ; Ä³¸®Áö ¸®ÅÏ Ã³¸®
+        ; íŠ¹ìˆ˜ ë¬¸ì ì²˜ë¦¬ë¥¼ ìœ„í•´ êµ¬ë¶„ì ì‚¬ìš©
+        encodedItem := StrReplace(item, "|", "ï½œ")  ; | ë¬¸ìë¥¼ ì „ê° ë¬¸ìë¡œ ëŒ€ì²´
+        encodedItem := StrReplace(encodedItem, "`n", "ï½œnï½œ")  ; ì¤„ë°”ê¿ˆ ì²˜ë¦¬
+        encodedItem := StrReplace(encodedItem, "`r", "ï½œrï½œ")  ; ìºë¦¬ì§€ ë¦¬í„´ ì²˜ë¦¬
         
         FileAppend, %encodedItem%`n, %HistoryFile%
     }
 }
 
-; ÆÄÀÏ¿¡¼­ È÷½ºÅä¸® ·Îµå
+; íŒŒì¼ì—ì„œ íˆìŠ¤í† ë¦¬ ë¡œë“œ
 LoadHistoryFromFile() {
     global ClipboardHistory, HistoryFile
     
@@ -184,27 +270,27 @@ LoadHistoryFromFile() {
     Loop, Read, %HistoryFile%
     {
         if (A_LoopReadLine != "") {
-            ; ÀÎÄÚµùµÈ ³»¿ë º¹¿ø
-            decodedItem := StrReplace(A_LoopReadLine, "£ür£ü", "`r")
-            decodedItem := StrReplace(decodedItem, "£ün£ü", "`n")
-            decodedItem := StrReplace(decodedItem, "£ü", "|")
+            ; ì¸ì½”ë”©ëœ ë‚´ìš© ë³µì›
+            decodedItem := StrReplace(A_LoopReadLine, "ï½œrï½œ", "`r")
+            decodedItem := StrReplace(decodedItem, "ï½œnï½œ", "`n")
+            decodedItem := StrReplace(decodedItem, "ï½œ", "|")
             
             ClipboardHistory.Push(decodedItem)
         }
     }
 }
 
-; ´õ¹Ì ÇÔ¼ö (¸Ş´º ¿À·ù ¹æÁö)
+; ë”ë¯¸ í•¨ìˆ˜ (ë©”ë‰´ ì˜¤ë¥˜ ë°©ì§€)
 DummyFunction() {
     return
 }
 
-; ½ºÅ©¸³Æ® Á¾·á ½Ã È÷½ºÅä¸® ÀúÀå
+; ìŠ¤í¬ë¦½íŠ¸ ì¢…ë£Œ ì‹œ íˆìŠ¤í† ë¦¬ ì €ì¥
 OnExit("SaveOnExit")
 
 SaveOnExit() {
     SaveHistoryToFile()
 }
 
-; ÃÊ±â ·Îµå ¿Ï·á ¾Ë¸²
-ShowTooltip("Å¬¸³º¸µå È÷½ºÅä¸® È°¼ºÈ­µÊ`nWin+C: º¹»ç ¹× ÀúÀå`nWin+Z: È÷½ºÅä¸® ¸Ş´º", 2000)
+; ì´ˆê¸° ë¡œë“œ ì™„ë£Œ ì•Œë¦¼
+ShowTooltip("í´ë¦½ë³´ë“œ íˆìŠ¤í† ë¦¬ í™œì„±í™”ë¨`nWin+C: ë³µì‚¬ ë° ì €ì¥`nWin+Z: íˆìŠ¤í† ë¦¬ ë©”ë‰´`nCtrl+Delete: ì‚­ì œ ë©”ë‰´`nShift+Delete: ìµœê·¼ í•­ëª© ì‚­ì œ", 3500)
