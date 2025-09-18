@@ -250,6 +250,8 @@ F14:: Send, #+{Left}
 F15:: Send, #+{Right} 
 
 ; F19:: Send, !c ; clcl 호출
+F17:: GoAndroidStudio(0)
+F18:: GoAndroidStudio(1)
 F19:: TOGGLE_TITLE("이쁜부인")
 F21:: TOGGLE_EXE("dopus.exe")
 F23:: Send, ^#!c ; Claunch 호출
@@ -364,23 +366,40 @@ OpenOrSetDialog(path) {
     ; 2. 현재 창이 Windows 탐색기일 경우 → 경로 변경
     WinGetClass, activeClass, A
     if (activeClass = "CabinetWClass") {
+        ClipSaved := ClipboardAll
+        Clipboard := path
         Send, !d       ; Alt + D → 주소창
         Sleep, 100
-        Send, %path%{Enter}
+        Send, ^a
+        Sleep, 50
+        Send, ^v{Enter}
+        Sleep, 100
+        Clipboard := ClipSaved
+        ClipSaved := ""
         return
     }
-    if WinActive("ahk_exe WindowsTerminal.exe") 
+    if WinActive("ahk_exe WindowsTerminal.exe")
     {
 		IfWinActive, wglim
 		{
+			ClipSaved := ClipboardAll
 			linuxPath := ConvertToLinuxPath(path)
-			SendInput, cd %linuxPath%{Enter}
+			Clipboard := "cd " . linuxPath
+			SendInput, ^v{Enter}
+			Sleep, 100
+			Clipboard := ClipSaved
+			ClipSaved := ""
 		}
-		else 
+		else
 		{
+			ClipSaved := ClipboardAll
 			drive := SubStr(path, 1, 2)      ; 예: D:
 			subPath := SubStr(path, 3)       ; 예: \Download 또는 \Users\Me...
-			SendInput, %drive% & cd %subPath%{Enter}
+			Clipboard := drive . " & cd " . subPath
+			SendInput, ^v{Enter}
+			Sleep, 100
+			Clipboard := ClipSaved
+			ClipSaved := ""
 		}
 		return
     }
