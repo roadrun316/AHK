@@ -6,7 +6,10 @@
 #SingleInstance Force
 #SingleInstance Off
 
+SendMode Input
 SetTitleMatchMode, 2
+SetKeyDelay, -1, -1
+SetBatchLines, -1
 
 ; ===================================================================================================
 ; TERATERM AUTOMATION
@@ -31,21 +34,31 @@ return
 ; WINDOWS TERMINAL AUTOMATION
 ; ===================================================================================================
 #IfWinActive ahk_exe WindowsTerminal.exe
-^NumpadDot:: sendInput adb disconnect
-^Numpad0:: sendInput adb connect 192.168.3.3
+^NumpadDot:: sendInput adb disconnect{Enter}
+^Numpad0::
+F13:: 
+    ShowAdbMenu()
+    return
 ^Numpad1:: sendInput adb shell cat /sdcard/EMLog/main/main.log | cgrep
-^Numpad3:: sendInput grep -a AndroidRuntime main.log{Enter}
+^Numpad3:: sendInput, grep -a AndroidRuntime main.log{Enter}
 ^Numpad4:: sendInput grep -a VERSION main.log{Enter}
 ;^Numpad7:: sendInput python e:\GitHub\Python\Y461\update_release.py{Enter}
 ^Numpad9::
+F14::
 	IfWinActive, wglim
+    {
 		sendInput python /mnt/e/GitHub/Python/U100LogManager.py{Enter}
+        Sleep, 100
+        sendInput 1{Enter}
+    }
 	else
 		sendInput python E:\GitHub\Python\U100LogManager.py{Enter}
 return
+
+
 !Numpad3::
 	IfWinActive, wglim
-		sendInput cd /mnt/e/GitHub{Enter}
+        F_Send_ToEnK(1, 0, "cd /mnt/e/GitHub{Enter}")
 	else
 	{
 		sendInput E:{Enter}
@@ -54,7 +67,7 @@ return
 return
 !Numpad4::
 	IfWinActive, wglim
-		sendInput cd /mnt/e/U100/App/Output{Enter}
+        F_Send_ToEnK(1, 0, "cd /mnt/e/U100/App/Output{Enter}")
 	else
 	{
 		sendInput E: 
@@ -62,8 +75,11 @@ return
 	}
 return
 !Numpad5::
+F16::
 	IfWinActive, wglim
-		sendInput cd /mnt/d/log{Enter}
+    {
+        F_Send_ToEnK(1, 0, "cd /mnt/d/log{Enter}")
+    }
 	else
 	{
 		sendInput D:{Enter}
@@ -71,6 +87,7 @@ return
 	}
 return
 !Numpad6::
+F15::
 	Time := 0
 	Loop D:\Log\*, 2
 	{
@@ -80,17 +97,25 @@ return
 		}
 	}
 	IfWinActive, wglim
-		IfExist, D:\Log\%Folder%\sdcard\EMLog
-			sendInput cd "%Folder%/sdcard/EMLog/main"{Enter}
+        IfExist, D:\Log\%Folder%\sdcard\EMLog
+        {
+            cmd := "cd """ . Folder . "/sdcard/EMLog/main""{Enter}"
+            F_Send_ToEnK(1, 0, cmd)
+        }
 		else
 			sendInput cd %Folder%/sdcard/WTLog/main{Enter}
 	else
-		IfExist, D:\Log\%Folder%\sdcard\EMLog
-			sendInput cd %Folder%\sdcard\EMLog\main{Enter}
+        IfExist, D:\Log\%Folder%\sdcard\EMLog
+        {
+            cmd := "cd """ . Folder . "\sdcard\EMLog\main""{Enter}"
+            sendInput %cmd%
+        }
 		else
 			sendInput cd %Folder%\sdcard\WTLog\main{Enter}
 return
 !Numpad7:: GoRecentlyFolder()
+F17:: sendInput ^!{Numpad1}
+F18:: sendInput ^!{Numpad2}
 #IfWinActive 
 ; ---------------------------------------------------------------------------------------------------
 ; Launcher_Mail
@@ -119,6 +144,8 @@ Launch_Mail::Send, ^w
 #IfWinActive ahk_exe chrome.exe
 Launch_Mail::Send, ^w
 #IfWinActive ahk_exe notepad++.exe
+Launch_Mail::Send, ^w
+#IfWinActive ahk_exe comet.exe
 Launch_Mail::Send, ^w
 #IfWinActive ahk_exe WindowsTerminal.exe
 Launch_Mail::Send, ^+w
@@ -244,16 +271,18 @@ F24::Send, ^{Enter}
 F19:: Send, {Esc}
 #IfWinActive
 
+^!F17:: TOGGLE_EXE("pycharm64.exe", "C:\Program Files\JetBrains\PyCharm Community Edition 2022.3.2\bin\pycharm64.exe")
+^!F18:: TOGGLE_EXE("Code.exe", "C:\Users\roadr\AppData\Local\Programs\Microsoft VS Code\Code.exe")
+^!F19:: GoAndroidStudio(1)
+^!F20:: GoAndroidStudio(0)
 
-F22:: Send, ○
-F14:: Send, #+{Left} 
-F15:: Send, #+{Right} 
+; F22:: Send, ○
+^!F23:: Send, #+{Left} 
+^!F24:: Send, #+{Right} 
 
 ; F19:: Send, !c ; clcl 호출
-F17:: GoAndroidStudio(0)
-F18:: GoAndroidStudio(1)
-F19:: TOGGLE_TITLE("이쁜부인")
-F21:: TOGGLE_EXE("dopus.exe")
+F20:: Send, ○
+F22:: TOGGLE_EXE("Xcom2.exe")
 F23:: Send, ^#!c ; Claunch 호출
 ; F18:: Send, ^!{Numpad7} ; clcl Template Coding 호출
 
@@ -261,11 +290,14 @@ F23:: Send, ^#!c ; Claunch 호출
 ; ===================================================================================================
 ; BROWSER & AI TOOLS (CTRL+ALT+WIN+F Keys)
 ; ===================================================================================================
-^!+#F19:: TOGGLE_EXE("dopus.exe")
-^!+#F20:: TOGGLE_TITLE("Whale", "C:\Users\roadr\AppData\Roaming\Microsoft\Internet Explorer\Quick Launch\User Pinned\TaskBar\네이버 웨일.lnk")
-^!+#F22:: TOGGLE_TITLE("이쁜부인")
-^!+#F23:: GoAndroidStudio(0)
-^!+#F24:: GoAndroidStudio(1)
+^!#F1:: TOGGLE_TITLE("이쁜부인")
+^!#F6:: TOGGLE_EXE("Code.exe", "C:\Users\roadr\AppData\Local\Programs\Microsoft VS Code\Code.exe")
+
+^!#F7:: TOGGLE_EXE("dopus.exe")
+^!#F8:: TOGGLE_TITLE("Whale", "C:\Users\roadr\AppData\Roaming\Microsoft\Internet Explorer\Quick Launch\User Pinned\TaskBar\네이버 웨일.lnk")
+^!#F9:: TOGGLE_EXE("comet.exe", "C:\Users\roadr\AppData\Local\Perplexity\Comet\Application\comet.exe")
+^!#F11:: GoAndroidStudio(1)
+^!#F12:: GoAndroidStudio(0)
 ;^!#F7:: TOGGLE_EXE("Perplexity.exe", "C:\Users\roadr\AppData\Local\Programs\Perplexity\Perplexity.exe")
 ;^!#F8:: TOGGLE_EXE("ChatGPT.exe", "C:\Users\roadr\AppData\Local\Microsoft\WindowsApps\chatgpt.exe")
 ;^!#F9:: TOGGLE_TITLE("Google Gemini", "C:\Users\roadr\AppData\Roaming\Microsoft\Internet Explorer\Quick Launch\User Pinned\ImplicitAppShortcuts\9501e18d7c2ab92e\원규 - Chrome.lnk")
@@ -275,6 +307,40 @@ F23:: Send, ^#!c ; Claunch 호출
 
 ;^!#F1:: TOGGLE_TITLE("Google AI Studio", "C:\Users\roadr\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\네이버 웨일 앱\Google AI Studio.lnk")
 ;^!#F2:: TOGGLE_EXE("Joplin.EXE", "C:\Program Files\Joplin\Joplin.exe")
+
+ShowAdbMenu()
+{
+	Menu, AdbMenu, Add, __dummy__, DummyHandler
+	Menu, AdbMenu, DeleteAll
+	Menu, AdbMenu, Add, &1 adb devices, AdbMenuHandler
+	Menu, AdbMenu, Add, &2 adb disconnect, AdbMenuHandler
+	Menu, AdbMenu, Add, &3 adb connect 192.168.3.3, AdbMenuHandler
+	Menu, AdbMenu, Add, &4 adb connect 192.168.3.20, AdbMenuHandler
+	Menu, AdbMenu, Add, &5 adb connect 192.168.3.141, AdbMenuHandler
+	Menu, AdbMenu, Add, (닫힘), DummyHandler
+	Menu, AdbMenu, Show
+}
+
+AdbMenuHandler:
+    selected := A_ThisMenuItem
+	cmd := ""
+	if (selected = "&1 adb devices" || selected = "adb devices")
+		cmd := "adb devices"
+	else if (selected = "&2 adb disconnect" || selected = "adb disconnect")
+		cmd := "adb disconnect"
+	else if (selected = "&3 adb connect 192.168.3.3" || selected = "adb connect 192.168.3.3")
+		cmd := "adb connect 192.168.3.3"
+	else if (selected = "&4 adb connect 192.168.3.20" || selected = "adb connect 192.168.3.20")
+		cmd := "adb connect 192.168.3.20"
+	else if (selected = "&5 adb connect 192.168.3.141" || selected = "adb connect 192.168.3.141")
+		cmd := "adb connect 192.168.3.141"
+	else
+	{
+        return
+	}
+
+    sendInput %cmd%{Enter}
+return
 
 Macro_ClusterAppUpload()
 {
@@ -305,13 +371,13 @@ Macro_GPU_busy()
 ;	Send, slog2info -b KGSL -w | grep measurement | grep "percentage busy" | awk '{print ($NF)}'{Enter}
 }
 
-^!#F6::
-;        Menu, MyFolderMenu, DeleteAll
-	Menu, MyFolderMenu2, Add, GPU 부하 측정, MenuHandler2
-	Menu, MyFolderMenu2, Add, Cluster App Upload, MenuHandler2
-	Menu, MyFolderMenu2, Add, (닫힘), DummyHandler
-	Menu, MyFolderMenu2, Show
-return
+; ^!#F6::
+; ;        Menu, MyFolderMenu, DeleteAll
+; 	Menu, MyFolderMenu2, Add, GPU 부하 측정, MenuHandler2
+; 	Menu, MyFolderMenu2, Add, Cluster App Upload, MenuHandler2
+; 	Menu, MyFolderMenu2, Add, (닫힘), DummyHandler
+; 	Menu, MyFolderMenu2, Show
+; return
 
 MenuHandler2:
     global isMenuVisible2
@@ -347,22 +413,7 @@ return
 	}
 return
 OpenOrSetDialog(path) {
-    ; 1. 파일 열기 대화상자 (#32770 + Edit1) 확인
-    WinGet, winList, List, ahk_class #32770
-    Loop, %winList%
-    {
-        this_id := winList%A_Index%
-		; 창의 실행 파일(exe) 이름 확인
-		WinGet, exeName, ProcessName, ahk_id %this_id%
-		if (exeName = "YES24eBook.exe")
-			continue  ; 이 창은 무시하고 다음 창으로 넘어감
-        ControlGet, exist, Hwnd,, Edit1, ahk_id %this_id%
-        if (exist) {
-            ControlSetText, Edit1, %path%, ahk_id %this_id%
-            ControlSend, Edit1, {Enter}, ahk_id %this_id%
-            return
-        }
-    }
+
     ; 2. 현재 창이 Windows 탐색기일 경우 → 경로 변경
     WinGetClass, activeClass, A
     if (activeClass = "CabinetWClass") {
@@ -378,6 +429,7 @@ OpenOrSetDialog(path) {
         ClipSaved := ""
         return
     }
+
     if WinActive("ahk_exe WindowsTerminal.exe")
     {
 		IfWinActive, wglim
@@ -392,7 +444,7 @@ OpenOrSetDialog(path) {
 		}
 		else
 		{
-			ClipSaved := ClipboardAll
+		    ClipSaved := ClipboardAll
 			drive := SubStr(path, 1, 2)      ; 예: D:
 			subPath := SubStr(path, 3)       ; 예: \Download 또는 \Users\Me...
 			Clipboard := drive . " & cd " . subPath
@@ -403,6 +455,24 @@ OpenOrSetDialog(path) {
 		}
 		return
     }
+
+        ; 1. 파일 열기 대화상자 (#32770 + Edit1) 확인
+    WinGet, winList, List, ahk_class #32770
+    Loop, %winList%
+    {
+        this_id := winList%A_Index%
+		; 창의 실행 파일(exe) 이름 확인
+		WinGet, exeName, ProcessName, ahk_id %this_id%
+		if (exeName = "YES24eBook.exe")
+			continue  ; 이 창은 무시하고 다음 창으로 넘어감
+        ControlGet, exist, Hwnd,, Edit1, ahk_id %this_id%
+        if (exist) {
+            ControlSetText, Edit1, %path%, ahk_id %this_id%
+            ControlSend, Edit1, {Enter}, ahk_id %this_id%
+            return
+        }
+    }
+    
     ; 3. 기본 동작 (DOpus로 열림)
     Run, %path%
 }
@@ -562,6 +632,7 @@ GoTab(TargetTitle)
     MsgBox, 48, 찾기 실패, "%TargetTitle%"을(를) 포함하는 탭을 찾을 수 없습니다.
   return
 }
+
 ; ===================================================================================================
 ; GLOBAL VARIABLES & UTILITY FUNCTIONS
 ; ===================================================================================================
@@ -681,6 +752,107 @@ OpenFolder:
 		SendInput, cd %SelectedPath%\sdcard\EMLog\main
 	}
 return
+
+;;IME관련 함수(검색해서 찾은것)
+Send_ImeControl(DefaultIMEWnd, wParam, lParam)
+{
+    DetectSave := A_DetectHiddenWindows
+    DetectHiddenWindows,ON
+    SendMessage 0x283, wParam,lParam, ,ahk_id %DefaultIMEWnd%
+    if (DetectSave <> A_DetectHiddenWindows)
+    {
+        DetectHiddenWindows,%DetectSave%
+        return ErrorLevel
+    }
+}
+ImmGetDefaultIMEWnd(hWnd)
+{
+    return DllCall("imm32\ImmGetDefaultIMEWnd", Uint, hWnd, Uint)
+}
+IME_CHECK(WinTitle)
+{
+    WinGet,hWnd,ID,%WinTitle%
+    Return Send_ImeControl(ImmGetDefaultIMEWnd(hWnd),0x005,"")
+}
+;내가 만든거
+;;option : 0(send), 1(sendinput), 2(sendraw)
+;;lang : 0(영어로 입력), 1(한글로 입력)
+;;str : 입력할 단어
+F_Send_ToEnK(option, lang, str)
+{
+    ime_status := % IME_CHECK("A")
+
+    if (lang = 0) ;영어로 입력
+    {
+        if (ime_status = "0")  ;현재 영어입력상태
+        {
+            if (option = 0)
+            {
+                Send, %str%
+            }
+            else if (option = 1)
+            {
+                SendInput, %str%
+            }
+            else if (option = 2)
+            {
+                SendRaw, %str%
+            }
+        }
+        else                   ;현재 한글입력상태
+        {
+            Send, {vk15sc138}  ;한영전환키
+            if (option = 0)
+            {
+                Send, %str%
+            }
+            else if (option = 1)
+            {
+                SendInput, %str%
+            }
+            else if (option = 2)
+            {
+                SendRaw, %str%
+            }
+        }
+    }
+    else if  (lang = 1) ;한글로 입력
+    {
+        if (ime_status = "0")  ;현재 영어입력상태
+        {
+            Send, {vk15sc138}  ;한영전환키
+            if (option = 0)
+            {
+                Send, %str%
+            }
+            else if (option = 1)
+            {
+                SendInput, %str%
+            }
+            else if (option = 2)
+            {
+                SendRaw, %str%
+            }
+        }
+        else                   ;현재 한글입력상태
+        {
+            if (option = 0)
+            {
+                Send, %str%
+            }
+            else if (option = 1)
+            {
+                SendInput, %str%
+            }
+            else if (option = 2)
+            {
+                SendRaw, %str%
+            }
+        }
+    }
+}
+
+
 ; ===================================================================================================
 ; HOTSTRINGS & TEXT EXPANSION
 ; ===================================================================================================
