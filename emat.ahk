@@ -11,83 +11,98 @@ SetTitleMatchMode, 2
 SetKeyDelay, -1, -1
 SetBatchLines, -1
 
+; 창 크기 조절 프리셋
+g_WindowSizeStandard := []
+g_WindowSizeStandard.Push([1920, 1080])
+g_WindowSizeStandard.Push([-1, -1])  ; 전체 화면
+g_WindowSizeDock := []
+g_WindowSizeDock.Push([1000, 1200])
+g_WindowSizeDock.Push(["dockLeft", 1600])  ; 좌측 1600px 도킹
+g_WindowSizeDock.Push(["dockRight", 975])  ; 우측 975px 도킹
+g_WindowSizeStandardIndex := 0
+g_WindowSizeDockIndex := 0
+
 ; ===================================================================================================
 ; TERATERM AUTOMATION
 ; ===================================================================================================
 #IfWinActive ahk_exe ttermpro.exe
 !1::
-	sendInput setprop persist.hibernated 0{Enter}
-	sendInput busybox mkswap /dev/block/mmcblk2p10{Enter}
+	SendInputE("setprop persist.hibernated 0{Enter}")
+	SendInputE("busybox mkswap /dev/block/mmcblk2p10{Enter}")
 return
-!3:: sendInput cat /reserved1/model-release{Enter}
+!3:: SendInputE("cat /reserved1/model-release{Enter}")
 !4::
-	sendInput cd sdcard{Enter}
-	sendInput logcat -c{Enter}
-	sendInput logcat -v time | grep EMS_TPEG > ems_log{Enter}
+	SendInputE("cd sdcard{Enter}")
+	SendInputE("logcat -c{Enter}")
+	SendInputE("logcat -v time | grep EMS_TPEG > ems_log{Enter}")
 return
 !0::
-	sendInput touch /tmp/system_started{Enter}
-	sendInput killall C300SystemService{Enter}
+	SendInputE("touch /tmp/system_started{Enter}")
+	SendInputE("killall C300SystemService{Enter}")
 return
 #IfWinActive
 ; ===================================================================================================
 ; WINDOWS TERMINAL AUTOMATION
 ; ===================================================================================================
-#IfWinActive ahk_exe WindowsTerminal.exe
-^NumpadDot:: sendInput adb disconnect{Enter}
+; #IfWinActive ahk_exe WindowsTerminal.exe
+#If (WinActive("ahk_exe WindowsTerminal.exe") or WinActive("ahk_exe wezterm-gui.exe"))
+
+; F13:: 
+;     ShowAdbMenu()
+
+^NumpadDot:: SendInputE("adb disconnect{Enter}")
 ^Numpad0::
-F13:: 
-    ShowAdbMenu()
+    SendInputE("adb devices -l{Enter}")
     return
-^Numpad1:: sendInput adb shell cat /sdcard/EMLog/main/main.log | cgrep
-^Numpad3:: sendInput, grep -a AndroidRuntime main.log{Enter}
-^Numpad4:: sendInput grep -a VERSION main.log{Enter}
+^Numpad1:: SendInputE("adb connect 192.168.3.")
+^Numpad2:: SendInputE("adb connect 192.168.3.20{Enter}")
+^Numpad3:: SendInputE("adb connect 192.168.3.141{Enter}")
+
+^Numpad5:: SendInputE("grep -a AndroidRuntime main.log{Enter}")
+^Numpad4:: SendInputE("grep -a VERSION main.log{Enter}")
+^Numpad6:: SendInputE("adb shell cat /sdcard/EMLog/main/main.log | cgrep")
 ;^Numpad7:: sendInput python e:\GitHub\Python\Y461\update_release.py{Enter}
 ^Numpad9::
-F14::
 	IfWinActive, wglim
-    {
-		sendInput python /mnt/e/GitHub/Python/U100LogManager.py{Enter}
-        Sleep, 100
-        sendInput 1{Enter}
-    }
+		SendInputE("python /mnt/e/GitHub/Python/U100LogManager.py{Enter}")
 	else
-		sendInput python E:\GitHub\Python\U100LogManager.py{Enter}
+		SendInputE("python E:\GitHub\Python\U100LogManager.py{Enter}")
 return
 
+AppsKey & Numpad1:: SendInputE("cd /sdcard/EMLog/main{Enter}")
+AppsKey & Numpad2:: SendInputE("cd /system/app{Enter}")
+AppsKey & Numpad3:: SendInputE("cd /system/app{Enter}")
 
 !Numpad3::
 	IfWinActive, wglim
-        F_Send_ToEnK(1, 0, "cd /mnt/e/GitHub{Enter}")
+        SendInputE("cd /mnt/e/GitHub{Enter}")
 	else
 	{
-		sendInput E:{Enter}
-		sendInput cd \GitHub{Enter}
+		SendInputE("E:{Enter}")
+		SendInputE("cd \GitHub{Enter}")
 	}
 return
 !Numpad4::
 	IfWinActive, wglim
-        F_Send_ToEnK(1, 0, "cd /mnt/e/U100/App/Output{Enter}")
+        SendInputE("cd /mnt/e/U100/App/Output{Enter}")
 	else
 	{
-		sendInput E: 
-		sendInput cd \U100\App\Output{Enter}
+		SendInputE("E: ")
+		SendInputE("cd \U100\App\Output{Enter}")
 	}
 return
 !Numpad5::
-F16::
 	IfWinActive, wglim
     {
-        F_Send_ToEnK(1, 0, "cd /mnt/d/log{Enter}")
+        SendInputE("cd /mnt/d/log{Enter}")
     }
 	else
 	{
-		sendInput D:{Enter}
-		sendInput cd \Log{Enter}
+		SendInputE("D:{Enter}")
+		SendInputE("cd \Log{Enter}")
 	}
 return
 !Numpad6::
-F15::
 	Time := 0
 	Loop D:\Log\*, 2
 	{
@@ -100,23 +115,48 @@ F15::
         IfExist, D:\Log\%Folder%\sdcard\EMLog
         {
             cmd := "cd """ . Folder . "/sdcard/EMLog/main""{Enter}"
-            F_Send_ToEnK(1, 0, cmd)
+            SendInputE(cmd)
+            
         }
 		else
-			sendInput cd %Folder%/sdcard/WTLog/main{Enter}
+			SendInputE("cd " . Folder . "/sdcard/WTLog/main{Enter}")
 	else
         IfExist, D:\Log\%Folder%\sdcard\EMLog
         {
             cmd := "cd """ . Folder . "\sdcard\EMLog\main""{Enter}"
-            sendInput %cmd%
+            SendInputE(cmd)
         }
 		else
-			sendInput cd %Folder%\sdcard\WTLog\main{Enter}
+			SendInputE("cd " . Folder . "\sdcard\WTLog\main{Enter}")
 return
+
+; --------------------------------------------------
+; 마우스 휠로 less 스크롤 (Up → PageUp, Down → PageDown)
+; --------------------------------------------------
+^WheelUp::
+    Loop 15
+        Send {Up}
+return
+
+^WheelDown::
+    Loop 15
+        Send {Down}
+return
+
++WheelUp::
+    Loop 3
+        Send {Up}
+return
+
++WheelDown::
+    Loop 3
+        Send {Down}
+return
+
+
 !Numpad7:: GoRecentlyFolder()
-F17:: sendInput ^!{Numpad1}
-F18:: sendInput ^!{Numpad2}
 #IfWinActive 
+
 ; ---------------------------------------------------------------------------------------------------
 ; Launcher_Mail
 ; ---------------------------------------------------------------------------------------------------
@@ -193,6 +233,10 @@ MenuHandler:
     isMenuVisible := false
 return
 
+AppsKey & Numpad1:: SendInputE("M73507255")
+AppsKey & Numpad2:: SendInputE("20280324")
+AppsKey & Numpad3:: SendInputE("3564158595054006")
+
 ; ===================================================================================================
 ; APPLICATION TOGGLING (WIN + NUMPAD)
 ; ===================================================================================================
@@ -232,17 +276,7 @@ return
 ^#Numpad2:: TOGGLE_EXE("WINWORD.EXE", "C:\Program Files\Microsoft Office\root\Office16\WINWORD.EXE")
 ^#Numpad3:: TOGGLE_EXE("POWERPNT.EXE", "C:\Program Files\Microsoft Office\root\Office16\POWERPNT.EXE")
 ^#Numpad4:: TOGGLE_EXE("OUTLOOK.EXE", "C:\Program Files\Microsoft Office\root\Office16\OUTLOOK.EXE")
-
-^Numpad7::
-  Run, python E:\GitHub\Python\GotoSource.py, ,Hide
-  ;~ WinActivate, ahk_exe studio64.exe
-  ;~ WinWaitActive, ahk_exe studio64.exe, , 5
-  ;~ Send {Ctrl}G
-  ;~ Sleep, 100
-  ;~ ; 클립보드 내용 직접 전송
-  ;~ Send %Clipboard%
-  ;~ Send {Enter}Send 
-return
+^#Numpad5:: TOGGLE_EXE("Notepad.exe", "C:\Program Files\WindowsApps\Microsoft.WindowsNotepad_11.2508.38.0_x64__8wekyb3d8bbwe\Notepad\Notepad.exe")
 
 ^Numpad8::
 	Reload
@@ -254,6 +288,9 @@ return
 #NumpadMult:: Run, E:\GitHub\AHK\keyboard_hook.ahk
 ^Numpad9:: sendRaw find / ! \( -path /proc -prune \) -name "*.rc" -exec grep -Hni XXX '{}' \;
 
+FUCNTION_HOTKEY_MAPPINGS()
+{
+}
 
 ; ===================================================================================================
 ; CLAUNCH & CLCL KEY MAPPINGS
@@ -267,24 +304,50 @@ F23::Send, {Esc}
 F24::Send, ^{Enter}
 #IfWinActive
 
-#IfWinActive ahk_exe CLCL.exe
-F19:: Send, {Esc}
-#IfWinActive
-
-^!F17:: TOGGLE_EXE("pycharm64.exe", "C:\Program Files\JetBrains\PyCharm Community Edition 2022.3.2\bin\pycharm64.exe")
-^!F18:: TOGGLE_EXE("Code.exe", "C:\Users\roadr\AppData\Local\Programs\Microsoft VS Code\Code.exe")
-^!F19:: GoAndroidStudio(1)
-^!F20:: GoAndroidStudio(0)
+; ^!F17:: TOGGLE_EXE("pycharm64.exe", "C:\Program Files\JetBrains\PyCharm Community Edition 2022.3.2\bin\pycharm64.exe")
+; ^!F18:: TOGGLE_EXE("Code.exe", "C:\Users\roadr\AppData\Local\Programs\Microsoft VS Code\Code.exe")
+; ^!F20:: TOGGLE_CYCLE("studio64.exe", "studio64.exe")
 
 ; F22:: Send, ○
-^!F23:: Send, #+{Left} 
-^!F24:: Send, #+{Right} 
+
+
+^!F20::   Run, python E:\GitHub\Python\GotoSource.py, ,Hide
+
+; ===================================================================================================
+; WINDOW SIZE MANAGEMENT
+; ===================================================================================================
+
+^!F21:: CycleDockWindowSize()
+^!F22:: CycleStandardWindowSize()
+^!F23:: Send, #+{Left}
+^!F24:: Send, #+{Right}
+
+; 활성 창 이동 (Ctrl+Win+화살표: 10픽셀씩)
+^#Up:: MoveActiveWindow(0, -10)
+^#Down:: MoveActiveWindow(0, 10)
+^#Left:: MoveActiveWindow(-10, 0)
+^#Right:: MoveActiveWindow(10, 0) 
+
+F13:: TOGGLE_CYCLE("kakaotalk.exe", "C:\Program Files (x86)\Kakao\KakaoTalk\KakaoTalk.exe")
+F14:: TOGGLE_CYCLE("notepad3.exe", "notepad3.exe")
 
 ; F19:: Send, !c ; clcl 호출
-F20:: Send, ○
-F22:: TOGGLE_EXE("Xcom2.exe")
-F23:: Send, ^#!c ; Claunch 호출
+
+; F20:: Send, ○{Enter}
+; F22:: TOGGLE_EXE("fm.exe")
+; F22:: TOGGLE_EXE("Palworld-Win64-Shipping.exe")
 ; F18:: Send, ^!{Numpad7} ; clcl Template Coding 호출
+
+
+F16:: TOGGLE_EXE("WindowsTerminal.exe", "C:\Program Files\WindowsApps\Microsoft.WindowsTerminal_1.22.11141.0_x64__8wekyb3d8bbwe\WindowsTerminal.exe")
+F17:: TOGGLE_EXE("dopus.exe")
+F18:: GoAndroidStudio(2)
+F19:: GoAndroidStudio(1)
+F20:: GoAndroidStudio(0)
+F23:: Send, ^#!c ; Claunch 호출
+;F24 Clipboard History 호출
+
++F15:: Send, {Media_Next}
 
 
 ; ===================================================================================================
@@ -294,8 +357,9 @@ F23:: Send, ^#!c ; Claunch 호출
 ^!#F6:: TOGGLE_EXE("Code.exe", "C:\Users\roadr\AppData\Local\Programs\Microsoft VS Code\Code.exe")
 
 ^!#F7:: TOGGLE_EXE("dopus.exe")
-^!#F8:: TOGGLE_TITLE("Whale", "C:\Users\roadr\AppData\Roaming\Microsoft\Internet Explorer\Quick Launch\User Pinned\TaskBar\네이버 웨일.lnk")
+^!#F8:: TOGGLE_EXE("Whale.exe", "C:\Users\roadr\AppData\Roaming\Microsoft\Internet Explorer\Quick Launch\User Pinned\TaskBar\네이버 웨일.lnk")
 ^!#F9:: TOGGLE_EXE("comet.exe", "C:\Users\roadr\AppData\Local\Perplexity\Comet\Application\comet.exe")
+^!#F10:: GoAndroidStudio(2)
 ^!#F11:: GoAndroidStudio(1)
 ^!#F12:: GoAndroidStudio(0)
 ;^!#F7:: TOGGLE_EXE("Perplexity.exe", "C:\Users\roadr\AppData\Local\Programs\Perplexity\Perplexity.exe")
@@ -317,6 +381,7 @@ ShowAdbMenu()
 	Menu, AdbMenu, Add, &3 adb connect 192.168.3.3, AdbMenuHandler
 	Menu, AdbMenu, Add, &4 adb connect 192.168.3.20, AdbMenuHandler
 	Menu, AdbMenu, Add, &5 adb connect 192.168.3.141, AdbMenuHandler
+    Menu, AdbMenu, Add, &6 adb connect 192.168.3., AdbMenuHandler
 	Menu, AdbMenu, Add, (닫힘), DummyHandler
 	Menu, AdbMenu, Show
 }
@@ -325,35 +390,37 @@ AdbMenuHandler:
     selected := A_ThisMenuItem
 	cmd := ""
 	if (selected = "&1 adb devices" || selected = "adb devices")
-		cmd := "adb devices"
+		cmd := "adb devices -l{Enter}"
 	else if (selected = "&2 adb disconnect" || selected = "adb disconnect")
-		cmd := "adb disconnect"
+		cmd := "adb disconnect{Enter}"
 	else if (selected = "&3 adb connect 192.168.3.3" || selected = "adb connect 192.168.3.3")
-		cmd := "adb connect 192.168.3.3"
+		cmd := "adb connect 192.168.3.3{Enter}"
 	else if (selected = "&4 adb connect 192.168.3.20" || selected = "adb connect 192.168.3.20")
-		cmd := "adb connect 192.168.3.20"
+		cmd := "adb connect 192.168.3.20{Enter}"
 	else if (selected = "&5 adb connect 192.168.3.141" || selected = "adb connect 192.168.3.141")
-		cmd := "adb connect 192.168.3.141"
+		cmd := "adb connect 192.168.3.141{Enter}"
+	else if (selected = "&6 adb connect 192.168.3." || selected = "adb connect 192.168.3.")
+		cmd := "adb connect 192.168.3."
 	else
 	{
         return
 	}
 
-    sendInput %cmd%{Enter}
+    SendInputE(cmd)
 return
 
 Macro_ClusterAppUpload()
 {
-	Send, adb shell{Enter}
-	Send, su{Enter}
-	Send, ssh root@192.168.1.1{Enter}
+	SendInputE("adb shell{Enter}")
+	SendInputE("su{Enter}")
+	SendInputE("ssh root@192.168.1.1{Enter}")
 	Sleep, 1000
-	Send, yes{Enter}
-	Send, slay vt_avm{Enter}
-	Send, cd /data/vt_avm_file{Enter}
-	Send, chmod 777 MvFile.sh{Enter}
-	Send, ./MvFile.sh{Enter}
-	Send, /usr/bin/vt_avm &{Enter}
+	SendInputE("yes{Enter}")
+	SendInputE("slay vt_avm{Enter}")
+	SendInputE("cd /data/vt_avm_file{Enter}")
+	SendInputE("chmod 777 MvFile.sh{Enter}")
+	SendInputE("./MvFile.sh{Enter}")
+	SendInputE("/usr/bin/vt_avm &{Enter}")
 }
 
 Macro_GPU_busy()
@@ -393,10 +460,13 @@ MenuHandler2:
     isMenuVisible2 := false
 return
 
+FUNCTION_KEY_MAPPINGS() {
+}
 
 ; ===================================================================================================
 ; FUNCTION KEY MAPPINGS & UTILITIES
 ; ===================================================================================================
+
 #F2::
 	Run, "C:\Program Files\Notepad3\Notepad3.exe"
 return
@@ -474,38 +544,57 @@ OpenOrSetDialog(path) {
     }
     
     ; 3. 기본 동작 (DOpus로 열림)
-    Run, %path%
+    Run, "%path%"
+    ; Run, "C:\Program Files\GPSoftware\Directory Opus\dopus.exe" "%path%"
 }
-TOGGLE_TITLE(procName, filePath="") {
-    if WinActive("" . procName)
-        WinMinimize, %procName%
-    else {
-    WinGet, processID, PID, %procName%
-        if (!processID) {
-            ; 프로세스가 실행 중이 아니면 실행
-            if (filePath != "") {
-                Run, %filePath%
-            } 
-        } else {
-            WinActivate, %procName%
-        }
+
+TOGGLE_TITLE(titlePattern, filePath := "")
+{
+    ; 현재 활성 창이 해당 타이틀인지 확인
+    if WinActive(titlePattern)
+    {
+        WinMinimize, %titlePattern%
+        return
+    }
+
+    ; 창 존재 여부 확인
+    if WinExist(titlePattern)
+    {
+        ; 창이 존재하면 활성화
+        WinActivate, %titlePattern%
+    }
+    else
+    {
+        ; 창이 없으면 실행
+        if (filePath != "")
+            Run, %filePath%
     }
 }
-TOGGLE_EXE(procName, filePath="") {
-    if WinActive("ahk_exe " . procName)
-        WinMinimize, ahk_exe %procName%
-    else {
-		WinGet, processID, ID, ahk_exe %procName%
-        if (!processID) {
-            ; 프로세스가 실행 중이 아니면 실행
-            if (filePath != "") {
-                Run, %filePath%
-            } 
-        } else {
-            WinActivate, ahk_exe %procName%
-        }
+
+TOGGLE_EXE(procName, filePath := "") {
+    fullName := "ahk_exe " . procName
+
+    ; 1) 현재 프로세스 창이 활성 상태 → 최소화
+    if WinActive(fullName) {
+        WinMinimize, %fullName%
+        return
     }
+
+    ; 2) 실행 중인지 PID 확인
+    WinGet, processID, PID, %fullName%
+
+    ; 3) 실행 중이 아니라면 → 실행
+    if (!processID) {
+        if (filePath != "") {
+            Run, %filePath%
+        }
+        return
+    }
+
+    ; 4) 실행중이지만 비활성 → 활성화
+    WinActivate, %fullName%
 }
+
 GoAndroidStudio(opt)
 {
     WinGet, id, List, ahk_class SunAwtFrame ahk_exe studio64.exe
@@ -513,11 +602,14 @@ GoAndroidStudio(opt)
     {
         this_id := id%A_Index%
         WinGetTitle, title, ahk_id %this_id%
-        ; opt=0: U100만 포함
-        ; opt=1: U100, Logcat 포함
-        if (opt = 0 && (!InStr(title, "U100") || InStr(title, "Logcat")))
-            continue
+        ; opt=1: Logcat 포함 창
+        ; opt=2: Firebender 포함 창
+        ; opt=0: 나머지 창 (Logcat, Firebender 제외)
         if (opt = 1 && !InStr(title, "Logcat"))
+            continue
+        if (opt = 2 && !InStr(title, "Firebender"))
+            continue
+        if (opt = 0 && (InStr(title, "Logcat") || InStr(title, "Firebender") || InStr(title, "Chat") || InStr(title, "Running Devices")))
             continue
         ; 토글 동작
         if WinActive("ahk_id " . this_id)
@@ -702,9 +794,9 @@ DummyFunction() {
 GoToFolder() {
   ;~ LinuxPath := ConvertToLinuxPath(A_ThisMenuItem)
 	IfExist, D:\Log\%A_ThisMenuItem%\sdcard\EMLog  ; EMLog 폴더가 있는지 확인
-		sendInput cd %A_ThisMenuItem%/sdcard/EMLog/main{Enter}
+		SendInputE("cd " . A_ThisMenuItem . "/sdcard/EMLog/main{Enter}")
 	Else
-		sendInput cd %A_ThisMenuItem%/sdcard/WTLog/main{Enter}
+		SendInputE("cd " . A_ThisMenuItem . "/sdcard/WTLog/main{Enter}")
   return
 }
 ConvertToLinuxPath(winPath) {
@@ -745,15 +837,15 @@ OpenFolder:
 	SelectedPath := Trim(A_ThisMenuItem)
 	IfWinActive, wglim
 	{
-		SendInput, cd /mnt/d/log/%SelectedPath%/sdcard/EMLog/main{Enter}
+		SendInputE("cd /mnt/d/log/" . SelectedPath . "/sdcard/EMLog/main{Enter}")
 	}
 	else
 	{
-		SendInput, cd %SelectedPath%\sdcard\EMLog\main
+		SendInputE("cd " . SelectedPath . "\sdcard\EMLog\main")
 	}
 return
 
-;;IME관련 함수(검색해서 찾은것)
+;IME관련 함수(검색해서 찾은것)
 Send_ImeControl(DefaultIMEWnd, wParam, lParam)
 {
     DetectSave := A_DetectHiddenWindows
@@ -774,82 +866,59 @@ IME_CHECK(WinTitle)
     WinGet,hWnd,ID,%WinTitle%
     Return Send_ImeControl(ImmGetDefaultIMEWnd(hWnd),0x005,"")
 }
-;내가 만든거
-;;option : 0(send), 1(sendinput), 2(sendraw)
-;;lang : 0(영어로 입력), 1(한글로 입력)
-;;str : 입력할 단어
+
+; 입력 전에 현재 IME가 한글(1)이면 영문(0)으로 전환
+EnsureEnglishInput(WinTitle := "A")
+{
+    ; imeStatus := IME_CHECK(WinTitle)
+    ; if (imeStatus != 0)
+    ; {
+    ;     Send, {vk15sc138}  ; 한/영 전환키
+    ;     Sleep, 50
+    ; }
+}
+
+SendE(str, WinTitle := "A")
+{
+    EnsureEnglishInput(WinTitle)
+    Send, %str%
+}
+
+SendInputE(str, WinTitle := "A")
+{
+    EnsureEnglishInput(WinTitle)
+    SendInput, %str%
+}
+
+SendRawE(str, WinTitle := "A")
+{
+    EnsureEnglishInput(WinTitle)
+    SendRaw, %str%
+}
+
+; option : 0(send), 1(sendinput), 2(sendraw)
+; lang : 0(영어로 입력), 1(한글로 입력)
+; str : 입력할 단어
 F_Send_ToEnK(option, lang, str)
 {
-    ime_status := % IME_CHECK("A")
+    imeStatus := IME_CHECK("A")
+    if (lang = 0 && imeStatus != 0)
+    {
+        Send, {vk15sc138}
+        Sleep, 50
+    }
+    else if (lang = 1 && imeStatus = 0)
+    {
+        Send, {vk15sc138}
+        Sleep, 50
+    }
 
-    if (lang = 0) ;영어로 입력
-    {
-        if (ime_status = "0")  ;현재 영어입력상태
-        {
-            if (option = 0)
-            {
-                Send, %str%
-            }
-            else if (option = 1)
-            {
-                SendInput, %str%
-            }
-            else if (option = 2)
-            {
-                SendRaw, %str%
-            }
-        }
-        else                   ;현재 한글입력상태
-        {
-            Send, {vk15sc138}  ;한영전환키
-            if (option = 0)
-            {
-                Send, %str%
-            }
-            else if (option = 1)
-            {
-                SendInput, %str%
-            }
-            else if (option = 2)
-            {
-                SendRaw, %str%
-            }
-        }
-    }
-    else if  (lang = 1) ;한글로 입력
-    {
-        if (ime_status = "0")  ;현재 영어입력상태
-        {
-            Send, {vk15sc138}  ;한영전환키
-            if (option = 0)
-            {
-                Send, %str%
-            }
-            else if (option = 1)
-            {
-                SendInput, %str%
-            }
-            else if (option = 2)
-            {
-                SendRaw, %str%
-            }
-        }
-        else                   ;현재 한글입력상태
-        {
-            if (option = 0)
-            {
-                Send, %str%
-            }
-            else if (option = 1)
-            {
-                SendInput, %str%
-            }
-            else if (option = 2)
-            {
-                SendRaw, %str%
-            }
-        }
-    }
+    if (option = 0)
+        Send, %str%
+    else if (option = 1)
+        SendInput, %str%
+    else if (option = 2)
+        SendRaw, %str%
 }
 
 
@@ -858,11 +927,11 @@ F_Send_ToEnK(option, lang, str)
 ; ===================================================================================================
 :*:date..::
 FormatTime, CurrentDateDate,%A_Now%, yyyy년 M월 d일  ; It will look like 9/1/2005 3:53 PM
-SendInput %CurrentDateDate%
+SendInputE(CurrentDateDate)
 return
 :*:time..::
 FormatTime, CurrentDateTime, %A_Now%, yyyy년 M월 d일 h:mm ; It will look like 9/1/2005 3:53 PM
-SendInput %CurrentDateTime%
+SendInputE(CurrentDateTime)
 return
 :*:em..::adb shell am broadcast -a action.ematsoft.test --es emdata --es value
 :*:ps..::ps -A | grep emat
@@ -898,3 +967,283 @@ return
     ClipSaved := ""
 return
 
+; ===================================================================================================
+; WINDOW SIZE HELPERS
+; ===================================================================================================
+CycleStandardWindowSize()
+{
+    global g_WindowSizeStandard, g_WindowSizeStandardIndex
+
+    if (!IsObject(g_WindowSizeStandard) || g_WindowSizeStandard.Length() = 0)
+        return
+
+    g_WindowSizeStandardIndex++
+    if (g_WindowSizeStandardIndex > g_WindowSizeStandard.Length())
+        g_WindowSizeStandardIndex := 1
+
+    preset := g_WindowSizeStandard[g_WindowSizeStandardIndex]
+    if (!IsObject(preset) || preset.Length() < 2)
+        return
+
+    width := preset[1]
+    height := preset[2]
+    ResizeActiveWindow(width, height)
+}
+
+CycleDockWindowSize()
+{
+    global g_WindowSizeDock, g_WindowSizeDockIndex
+
+    if (!IsObject(g_WindowSizeDock) || g_WindowSizeDock.Length() = 0)
+        return
+
+    g_WindowSizeDockIndex++
+    if (g_WindowSizeDockIndex > g_WindowSizeDock.Length())
+        g_WindowSizeDockIndex := 1
+
+    preset := g_WindowSizeDock[g_WindowSizeDockIndex]
+    if (!IsObject(preset) || preset.Length() < 2)
+        return
+
+    placement := preset[1]
+    target := preset[2]
+    if (placement = "dockLeft")
+    {
+        ResizeActiveWindowDockLeft(target)
+        return
+    }
+    else if (placement = "dockRight")
+    {
+        ResizeActiveWindowDockRight(target)
+        return
+    }
+    else if placement is number
+    {
+        width := placement
+        height := (preset.Length() >= 2) ? target : placement
+        ResizeActiveWindow(width, height)
+        return
+    }
+
+    ; 알 수 없는 형식은 우측 도킹으로 처리
+    ResizeActiveWindowDockRight(target)
+}
+
+ResizeActiveWindow(width, height)
+{
+    WinGet, hwnd, ID, A
+    if (!hwnd)
+        return
+
+    WinGet, currentState, MinMax, ahk_id %hwnd%
+    if (currentState != 0)
+        WinRestore, ahk_id %hwnd%
+
+    GetMonitorWorkArea(hwnd, workLeft, workTop, workRight, workBottom)
+    if (workLeft = "")
+    {
+        workLeft := 0
+        workTop := 0
+        workRight := A_ScreenWidth
+        workBottom := A_ScreenHeight
+    }
+
+    maxWidth := workRight - workLeft
+    maxHeight := workBottom - workTop
+
+    if (width = -1 && height = -1)
+    {
+        WinMaximize, ahk_id %hwnd%
+        return
+    }
+
+    if (width > maxWidth)
+        width := maxWidth
+    if (height > maxHeight)
+        height := maxHeight
+
+    newX := workLeft + ((maxWidth - width) // 2)
+    newY := workTop + ((maxHeight - height) // 2)
+    WinMove, ahk_id %hwnd%, , %newX%, %newY%, %width%, %height%
+}
+
+ResizeActiveWindowDockRight(width)
+{
+    WinGet, hwnd, ID, A
+    if (!hwnd)
+        return
+
+    WinGet, currentState, MinMax, ahk_id %hwnd%
+    if (currentState != 0)
+        WinRestore, ahk_id %hwnd%
+
+    GetMonitorWorkArea(hwnd, workLeft, workTop, workRight, workBottom)
+    if (workLeft = "")
+    {
+        workLeft := 0
+        workTop := 0
+        workRight := A_ScreenWidth
+        workBottom := A_ScreenHeight
+    }
+
+    maxWidth := workRight - workLeft
+    maxHeight := workBottom - workTop
+
+    if (width <= 0 || width > maxWidth)
+        width := maxWidth
+
+    newX := workRight - width
+    newY := workTop
+    WinMove, ahk_id %hwnd%, , %newX%, %newY%, %width%, %maxHeight%
+}
+
+ResizeActiveWindowDockLeft(width)
+{
+    WinGet, hwnd, ID, A
+    if (!hwnd)
+        return
+
+    WinGet, currentState, MinMax, ahk_id %hwnd%
+    if (currentState != 0)
+        WinRestore, ahk_id %hwnd%
+
+    GetMonitorWorkArea(hwnd, workLeft, workTop, workRight, workBottom)
+    if (workLeft = "")
+    {
+        workLeft := 0
+        workTop := 0
+        workRight := A_ScreenWidth
+        workBottom := A_ScreenHeight
+    }
+
+    maxWidth := workRight - workLeft
+    maxHeight := workBottom - workTop
+
+    if (width <= 0 || width > maxWidth)
+        width := maxWidth
+
+    newX := workLeft
+    newY := workTop
+    WinMove, ahk_id %hwnd%, , %newX%, %newY%, %width%, %maxHeight%
+}
+
+GetMonitorWorkArea(hwnd, ByRef left, ByRef top, ByRef right, ByRef bottom)
+{
+    monitor := DllCall("MonitorFromWindow", "ptr", hwnd, "uint", 2, "ptr")
+    if (!monitor)
+        return
+
+    VarSetCapacity(mi, 40, 0)
+    NumPut(40, mi, 0, "UInt")
+
+    if !DllCall("GetMonitorInfo", "ptr", monitor, "ptr", &mi)
+        return
+
+    left := NumGet(mi, 20, "Int")
+    top := NumGet(mi, 24, "Int")
+    right := NumGet(mi, 28, "Int")
+    bottom := NumGet(mi, 32, "Int")
+}
+
+; 함수로 만들기
+DebugLog(msg)
+{
+    FormatTime, time, , HH:mm:ss
+    OutputDebug, [%time%] %msg%
+}
+
+TOGGLE_CYCLE(procName, filePath := "")
+{
+    static lastWinID := {}  ; 프로세스별 마지막 창 ID 저장
+
+    ; 특정 프로세스의 모든 창 ID 수집
+    windowList := []
+    WinGet, idList, List, ahk_exe %procName%
+
+    if (idList = 0)
+    {
+        if (filePath != "")
+            Run, %filePath%
+        return
+    }
+
+    ; 배열에 저장 (ID 기준으로 정렬하여 순서를 고정)
+    Loop, %idList%
+    {
+        windowList.Push(idList%A_Index%)
+    }
+
+    ; 창 ID로 정렬 (순서 고정)
+    ; 버블 정렬 사용
+    Loop, % windowList.Length()
+    {
+        i := A_Index
+        Loop, % windowList.Length() - i
+        {
+            j := A_Index
+            if (windowList[j] > windowList[j + 1])
+            {
+                temp := windowList[j]
+                windowList[j] := windowList[j + 1]
+                windowList[j + 1] := temp
+            }
+        }
+    }
+
+    ; 마지막 활성화한 창 ID 찾기
+    currentIndex := 0
+    if (lastWinID.HasKey(procName))
+    {
+        lastID := lastWinID[procName]
+        ; 마지막 창 ID가 현재 목록에 있는지 확인
+        for index, winID in windowList
+        {
+            if (winID = lastID)
+            {
+                currentIndex := index
+                break
+            }
+        }
+    }
+
+    ; 다음 인덱스 결정 (순환)
+    if (currentIndex >= windowList.Length())
+        nextIndex := 1
+    else
+        nextIndex := currentIndex + 1
+
+    targetID := windowList[nextIndex]
+
+    ; 마지막 창 ID 저장
+    lastWinID[procName] := targetID
+
+    ; 활성화
+    WinGet, minMax, MinMax, ahk_id %targetID%
+    if (minMax = -1)
+        WinRestore, ahk_id %targetID%
+
+    WinActivate, ahk_id %targetID%
+    WinWaitActive, ahk_id %targetID%, , 1
+}
+
+MoveActiveWindow(deltaX, deltaY)
+{
+    WinGet, hwnd, ID, A
+    if (!hwnd)
+        return
+
+    ; 최대화된 창은 이동하지 않음
+    WinGet, currentState, MinMax, ahk_id %hwnd%
+    if (currentState != 0)
+        return
+
+    ; 현재 창 위치 가져오기
+    WinGetPos, winX, winY, winW, winH, ahk_id %hwnd%
+
+    ; 새 위치 계산
+    newX := winX + deltaX
+    newY := winY + deltaY
+
+    ; 창 이동
+    WinMove, ahk_id %hwnd%, , %newX%, %newY%
+}

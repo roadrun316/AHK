@@ -1,1 +1,0 @@
-- 통화 중 TopApp 변경 체크 보완 ([J145 EU AVN][FTS] Power Off 화면 유지되지 않음. https://digen.atlassian.net/browse/DGJ145-189)
