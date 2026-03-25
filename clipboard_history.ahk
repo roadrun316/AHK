@@ -3,15 +3,19 @@
 SendMode Input
 SetWorkingDir %A_ScriptDir%
 
-; 클립보드 히스토리 설정
-MaxHistoryItems := 20  ; 최대 히스토리 개수
-ClipboardHistory := []  ; 히스토리 배열
-HistoryFile := A_ScriptDir . "\clipboard_history.txt"  ; 히스토리 파일
+; ==== Clipboard History Settings ====
+MaxHistoryItems := 20  ; 슬롯별 최대 히스토리 개수
+SlotCount := 3
+CurrentSlot := 1
+ClipboardHistories := []
+HistoryFiles := []
+LegacyHistoryFile := A_ScriptDir . "\clipboard_history.txt"
 
-; 스크립트 시작 시 히스토리 로드
-LoadHistoryFromFile()
+; 스크립트 시작 시 슬롯 초기화 및 히스토리 로드
+InitializeHistorySlots()
+LoadAllHistoryFromFiles()
 
-; Win+C: 복사하고 히스토리에 저장
+; Ctrl+F24: 복사하고 현재 슬롯 히스토리에 저장
 ^F24::
     ; 기본 복사 실행 (Ctrl+C)
     Send ^c
@@ -21,12 +25,17 @@ LoadHistoryFromFile()
     AddToHistory(Clipboard)
     
     ; 상태 표시
-    ShowTooltip("복사됨: " . GetPreview(Clipboard), 1500)
+    ShowTooltip(GetSlotLabel() . " 복사됨: " . GetPreview(Clipboard), 1500)
 return
 
-; Win+Z: 히스토리 선택 메뉴 표시
+; F24: 현재 슬롯 히스토리 선택 메뉴 표시
 F24::
     ShowHistoryMenu()
+return
+
+; Alt+F24: 활성 슬롯 순환 전환
+!F24::
+    CycleClipboardSlot()
 return
 
 ; Ctrl+Delete: 삭제 메뉴 표시
@@ -39,79 +48,144 @@ return
 ;    DeleteLastUsedItem()
 ;return
 
-; 히스토리에 새 항목 추가
+; ==== Slot Initialization ====
+InitializeHistorySlots() {
+    global ClipboardHistories, HistoryFiles, SlotCount
+    
+    ClipboardHistories := []
+    HistoryFiles := []
+    
+    Loop, %SlotCount%
+    {
+        slot := A_Index
+        ClipboardHistories[slot] := []
+        HistoryFiles[slot] := A_ScriptDir . "\clipboard_history_" . slot . ".txt"
+    }
+}
+
+LoadAllHistoryFromFiles() {
+    global SlotCount
+    
+    Loop, %SlotCount%
+        LoadHistoryFromFile(A_Index)
+}
+
+GetSlotHistory(slot := "") {
+    global ClipboardHistories, CurrentSlot
+    
+    if (slot = "")
+        slot := CurrentSlot
+    
+    if !IsObject(ClipboardHistories[slot])
+        ClipboardHistories[slot] := []
+    
+    return ClipboardHistories[slot]
+}
+
+GetSlotLabel(slot := "") {
+    global CurrentSlot
+    
+    if (slot = "")
+        slot := CurrentSlot
+    
+    return "슬롯 " . slot
+}
+
+IsHistoryEmpty(history) {
+    return (history.MaxIndex() = "" || history.MaxIndex() = 0)
+}
+
+CycleClipboardSlot() {
+    global CurrentSlot, SlotCount
+    
+    CurrentSlot += 1
+    if (CurrentSlot > SlotCount)
+        CurrentSlot := 1
+    
+    ShowTooltip("클립보드 " . GetSlotLabel() . " 활성화", 1200)
+}
+
+; ==== History Actions ====
+; 현재 슬롯 히스토리에 새 항목 추가
 AddToHistory(NewItem) {
-    global ClipboardHistory, MaxHistoryItems
+    global CurrentSlot, MaxHistoryItems
+    history := GetSlotHistory()
     
     ; 빈 내용이면 추가하지 않음
     if (StrLen(Trim(NewItem)) = 0)
         return
     
     ; 중복 제거: 이미 존재하면 해당 항목을 맨 앞으로 이동
-    for index, item in ClipboardHistory {
+    for index, item in history {
         if (item = NewItem) {
-            ClipboardHistory.RemoveAt(index)
+            history.RemoveAt(index)
             break
         }
     }
     
     ; 맨 앞에 새 항목 추가
-    ClipboardHistory.InsertAt(1, NewItem)
+    history.InsertAt(1, NewItem)
     
     ; 최대 개수 초과 시 마지막 항목 제거
-    if (ClipboardHistory.MaxIndex() > MaxHistoryItems) {
-        ClipboardHistory.RemoveAt(MaxHistoryItems + 1)
+    if (history.MaxIndex() > MaxHistoryItems) {
+        history.RemoveAt(MaxHistoryItems + 1)
     }
     
-    ; 히스토리 파일에 저장
-    SaveHistoryToFile()
+    ; 현재 슬롯 히스토리 파일에 저장
+    SaveHistoryToFile(CurrentSlot)
 }
 
-; 히스토리 메뉴 표시
+; 현재 슬롯 히스토리 메뉴 표시
 ShowHistoryMenu() {
-    global ClipboardHistory
+    history := GetSlotHistory()
+    slotLabel := GetSlotLabel()
     
     ; 기존 메뉴 삭제
     Menu, ClipHistoryMenu, Add, Temp, DummyFunction
     Menu, ClipHistoryMenu, DeleteAll
     
     ; 히스토리가 비어있으면 메시지 표시
-    if (ClipboardHistory.MaxIndex() = 0 || ClipboardHistory.MaxIndex() = "") {
-        Menu, ClipHistoryMenu, Add, (히스토리 없음), DummyFunction
-        Menu, ClipHistoryMenu, Disable, (히스토리 없음)
+    if (IsHistoryEmpty(history)) {
+        emptyText := slotLabel . " (히스토리 없음)"
+        Menu, ClipHistoryMenu, Add, %emptyText%, DummyFunction
+        Menu, ClipHistoryMenu, Disable, %emptyText%
     } else {
         ; 히스토리 항목들을 메뉴에 추가
-        for index, item in ClipboardHistory {
+        for index, item in history {
             preview := GetPreview(item)
             menuText := index . ". " . preview
             Menu, ClipHistoryMenu, Add, %menuText%, PasteFromHistory
         }
         
         ; 구분선과 관리 옵션 추가
+        deleteMenuText := slotLabel . " 개별 삭제 메뉴"
+        clearMenuText := slotLabel . " 히스토리 지우기"
         Menu, ClipHistoryMenu, Add,
-        Menu, ClipHistoryMenu, Add, 개별 삭제 메뉴, ShowDeleteMenu
-        Menu, ClipHistoryMenu, Add, 히스토리 지우기, ClearHistory
+        Menu, ClipHistoryMenu, Add, %deleteMenuText%, ShowDeleteMenu
+        Menu, ClipHistoryMenu, Add, %clearMenuText%, ClearHistory
     }
     
     ; 메뉴 표시
     Menu, ClipHistoryMenu, Show
 }
 
-; 삭제 전용 메뉴 표시
+; 현재 슬롯 삭제 전용 메뉴 표시
 ShowDeleteMenu() {
-    global ClipboardHistory
+    history := GetSlotHistory()
+    slotLabel := GetSlotLabel()
     
     ; 기존 메뉴 삭제
     Menu, ClipDeleteMenu, Add, Temp, DummyFunction
     Menu, ClipDeleteMenu, DeleteAll
     
     ; 히스토리가 비어있으면 메시지 표시
-    if (ClipboardHistory.MaxIndex() = 0 || ClipboardHistory.MaxIndex() = "") {
-        Menu, ClipDeleteMenu, Add, (삭제할 항목 없음), DummyFunction
-        Menu, ClipDeleteMenu, Disable, (삭제할 항목 없음)
+    if (IsHistoryEmpty(history)) {
+        emptyText := slotLabel . " (삭제할 항목 없음)"
+        Menu, ClipDeleteMenu, Add, %emptyText%, DummyFunction
+        Menu, ClipDeleteMenu, Disable, %emptyText%
     } else {
         ; 삭제할 항목들을 메뉴에 추가
-        for index, item in ClipboardHistory {
+        for index, item in history {
             preview := GetPreview(item)
             deleteText := "삭제: " . index . ". " . preview
             Menu, ClipDeleteMenu, Add, %deleteText%, DeleteHistoryItem
@@ -128,87 +202,95 @@ ShowDeleteMenu() {
 
 ; 히스토리에서 선택한 항목 붙여넣기
 PasteFromHistory() {
-    global ClipboardHistory
+    history := GetSlotHistory()
     
     ; 메뉴 텍스트에서 인덱스 추출 (1. preview -> 1)
     RegExMatch(A_ThisMenuItem, "^(\d+)\.", match)
     index := match1
     
-    if (index > 0 && index <= ClipboardHistory.MaxIndex()) {
+    if (index > 0 && index <= history.MaxIndex()) {
         ; 클립보드에 선택한 항목 설정
-        Clipboard := ClipboardHistory[index]
+        selectedItem := history[index]
+        Clipboard := selectedItem
         Sleep 50
         
         ; 붙여넣기 실행
         Send ^v
         
         ; 선택한 항목을 맨 앞으로 이동 (최근 사용순 정렬)
-;        selectedItem := ClipboardHistory[index]
-;        ClipboardHistory.RemoveAt(index)
-;        ClipboardHistory.InsertAt(1, selectedItem)
-;        SaveHistoryToFile()
+;        history.RemoveAt(index)
+;        history.InsertAt(1, selectedItem)
+;        SaveHistoryToFile(CurrentSlot)
         
         ; 상태 표시
-        ShowTooltip("붙여넣기: " . GetPreview(selectedItem), 1000)
+        ShowTooltip(GetSlotLabel() . " 붙여넣기: " . GetPreview(selectedItem), 1000)
     }
 }
 
 ; 개별 히스토리 항목 삭제
 DeleteHistoryItem() {
-    global ClipboardHistory
+    global CurrentSlot
+    history := GetSlotHistory()
+    slotLabel := GetSlotLabel()
     
     ; 메뉴 텍스트에서 인덱스 추출 (삭제: 1. preview -> 1)
-    RegExMatch(A_ThisMenuItem, "삭제: (\d+)\.", match)
+    RegExMatch(A_ThisMenuItem, "^삭제: (\d+)\.", match)
     index := match1
     
-    if (index > 0 && index <= ClipboardHistory.MaxIndex()) {
+    if (index > 0 && index <= history.MaxIndex()) {
         ; 삭제할 항목의 미리보기
-        itemPreview := GetPreview(ClipboardHistory[index])
+        itemPreview := GetPreview(history[index])
+        confirmMessage := slotLabel . "에서 다음 항목을 삭제하시겠습니까?`n`n""" . itemPreview . """"
         
         ; 확인 메시지
-        MsgBox, 4, 확인, 다음 항목을 삭제하시겠습니까?`n`n"%itemPreview%"
+        MsgBox, 4, 확인, %confirmMessage%
         IfMsgBox Yes
         {
             ; 항목 삭제
-            ClipboardHistory.RemoveAt(index)
-            SaveHistoryToFile()
-            ShowTooltip("항목이 삭제되었습니다", 1000)
+            history.RemoveAt(index)
+            SaveHistoryToFile(CurrentSlot)
+            ShowTooltip(slotLabel . " 항목이 삭제되었습니다", 1000)
         }
     }
 }
 
 ; 최근 사용한 항목 삭제 (첫 번째 항목)
 DeleteLastUsedItem() {
-    global ClipboardHistory
+    global CurrentSlot
+    history := GetSlotHistory()
+    slotLabel := GetSlotLabel()
     
-    if (ClipboardHistory.MaxIndex() > 0) {
+    if !IsHistoryEmpty(history) {
         ; 첫 번째 항목의 미리보기
-        itemPreview := GetPreview(ClipboardHistory[1])
+        itemPreview := GetPreview(history[1])
+        confirmMessage := slotLabel . "의 최근 사용 항목을 삭제하시겠습니까?`n`n""" . itemPreview . """"
         
         ; 확인 메시지
-        MsgBox, 4, 확인, 최근 사용 항목을 삭제하시겠습니까?`n`n"%itemPreview%"
+        MsgBox, 4, 확인, %confirmMessage%
         IfMsgBox Yes
         {
             ; 첫 번째 항목 삭제
-            ClipboardHistory.RemoveAt(1)
-            SaveHistoryToFile()
-            ShowTooltip("최근 사용 항목이 삭제되었습니다", 1000)
+            history.RemoveAt(1)
+            SaveHistoryToFile(CurrentSlot)
+            ShowTooltip(slotLabel . " 최근 사용 항목이 삭제되었습니다", 1000)
         }
     } else {
-        ShowTooltip("삭제할 히스토리 항목이 없습니다", 1000)
+        ShowTooltip(slotLabel . " 삭제할 히스토리 항목이 없습니다", 1000)
     }
 }
 
-; 히스토리 지우기
+; 현재 슬롯 히스토리 지우기
 ClearHistory() {
-    global ClipboardHistory
+    global ClipboardHistories, CurrentSlot
+    slotLabel := GetSlotLabel()
+    confirmMessage := slotLabel . " 히스토리를 모두 지우시겠습니까?"
     
-    MsgBox, 4, 확인, 클립보드 히스토리를 모두 지우시겠습니까?
+    MsgBox, 4, 확인, %confirmMessage%
     IfMsgBox Yes
     {
-        ClipboardHistory := []
-        SaveHistoryToFile()
-        ShowTooltip("히스토리가 지워졌습니다", 1000)
+        ClipboardHistories[CurrentSlot] := []
+        SaveHistoryToFile(CurrentSlot)
+        ShowTooltip(slotLabel . " 히스토리가 지워졌습니다", 1000)
     }
 }
 
@@ -242,32 +324,45 @@ RemoveTooltip:
     ToolTip
 return
 
-; 히스토리를 파일에 저장
-SaveHistoryToFile() {
-    global ClipboardHistory, HistoryFile
+; ==== File Persistence ====
+; 특정 슬롯 히스토리를 파일에 저장
+SaveHistoryToFile(slot) {
+    global HistoryFiles
+    history := GetSlotHistory(slot)
+    historyFile := HistoryFiles[slot]
     
-    FileDelete, %HistoryFile%
+    FileDelete, %historyFile%
     
-    for index, item in ClipboardHistory {
+    if (IsHistoryEmpty(history)) {
+        FileAppend,, %historyFile%
+        return
+    }
+    
+    for index, item in history {
         ; 특수 문자 처리를 위해 구분자 사용
         encodedItem := StrReplace(item, "|", "｜")  ; | 문자를 전각 문자로 대체
         encodedItem := StrReplace(encodedItem, "`n", "｜n｜")  ; 줄바꿈 처리
         encodedItem := StrReplace(encodedItem, "`r", "｜r｜")  ; 캐리지 리턴 처리
         
-        FileAppend, %encodedItem%`n, %HistoryFile%
+        FileAppend, %encodedItem%`n, %historyFile%
     }
 }
 
-; 파일에서 히스토리 로드
-LoadHistoryFromFile() {
-    global ClipboardHistory, HistoryFile
+; 특정 슬롯 히스토리를 파일에서 로드
+LoadHistoryFromFile(slot) {
+    global ClipboardHistories, HistoryFiles, LegacyHistoryFile
+    historyFile := HistoryFiles[slot]
     
-    if !FileExist(HistoryFile)
-        return
+    ClipboardHistories[slot] := []
     
-    ClipboardHistory := []
+    if !FileExist(historyFile) {
+        if (slot = 1 && FileExist(LegacyHistoryFile))
+            historyFile := LegacyHistoryFile
+        else
+            return
+    }
     
-    Loop, Read, %HistoryFile%
+    Loop, Read, %historyFile%
     {
         if (A_LoopReadLine != "") {
             ; 인코딩된 내용 복원
@@ -275,7 +370,7 @@ LoadHistoryFromFile() {
             decodedItem := StrReplace(decodedItem, "｜n｜", "`n")
             decodedItem := StrReplace(decodedItem, "｜", "|")
             
-            ClipboardHistory.Push(decodedItem)
+            ClipboardHistories[slot].Push(decodedItem)
         }
     }
 }
@@ -288,9 +383,12 @@ DummyFunction() {
 ; 스크립트 종료 시 히스토리 저장
 OnExit("SaveOnExit")
 
-SaveOnExit() {
-    SaveHistoryToFile()
+SaveOnExit(exitReason := "", exitCode := 0) {
+    global SlotCount
+    
+    Loop, %SlotCount%
+        SaveHistoryToFile(A_Index)
 }
 
 ; 초기 로드 완료 알림
-ShowTooltip("클립보드 히스토리 활성화됨`nWin+C: 복사 및 저장`nWin+Z: 히스토리 메뉴`nCtrl+Delete: 삭제 메뉴`nShift+Delete: 최근 항목 삭제", 3500)
+ShowTooltip("클립보드 히스토리 활성화됨`nCtrl+F24: 복사 및 저장`nF24: 현재 슬롯 메뉴`nAlt+F24: 슬롯 전환", 3500)
