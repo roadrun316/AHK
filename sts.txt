@@ -1,0 +1,23 @@
+Miniature Cannon: 강화된 공격 카드의 피해량이 3 증가합니다.
+Horn Cleat: 두 번째 턴 시작 시, 방어도를 14 얻습니다.
+Captain's Wheel: 세 번째 턴 시작 시, 방어도를 18 얻습니다.
+Paper Phrog: 취약 상태의 적이 받는 피해가 50%가 아닌 75% 증가합니다.
+Molten Egg: 공격 카드를 덱에 추가할 때마다, 그 카드를 강화합니다.
+Frozen Egg: 파워 카드를 덱에 추가할 때마다, 그 카드를 강화합니다.
+Toxic Egg: 스킬 카드를 덱에 추가할 때마다, 그 카드를 강화합니다.
+Unceasing Top: 내 턴 동안 손에 카드가 없다면, 카드를 1장 뽑습니다.
+The Courier: 상인이 판매하는 카드, 유물, 포션이 품절되지 않으며, 판매 금액이 20% 감소합니다.
+Ice Cream: 턴 종료 시 남은 에너지가 사라지지 않습니다.
+Vexing Puzzlebox: 매 전투 시작 시, 무작위 카드를 1장 손으로 가져옵니다. 그 카드의 비용이 0의 에너지가 됩니다.
+Sturdy Clamp: 턴 사이에 방어도가 최대 10까지 유지됩니다.
+Miniature Tent: 휴식 장소에서 선택지를 원하는 만큼 선택할 수 있습니다.
+Dragon Fruit: 골드를 획득할 때마다, 최대 체력이 1 증가합니다.
+Chemical X: 비용이 X인 카드의 효과가 2 증가합니다.
+
+Strike Dummy: 이름에 "타격"이 포함된 카드의 피해량이 3 증가합니다.
+
+
+relic add MINIATURE_CANNON
+relic add UNCEASING_TOP
+relic add STURDY_CLAMP
+relic add STURDY_CLAMP

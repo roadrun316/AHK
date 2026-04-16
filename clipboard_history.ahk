@@ -392,3 +392,5 @@ SaveOnExit(exitReason := "", exitCode := 0) {
 
 ; 초기 로드 완료 알림
 ShowTooltip("클립보드 히스토리 활성화됨`nCtrl+F24: 복사 및 저장`nF24: 현재 슬롯 메뉴`nAlt+F24: 슬롯 전환", 3500)
+
+

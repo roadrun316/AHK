@@ -1,0 +1,25 @@
+Windows Registry Editor Version 5.00
+
+; ─ 파일(모든 파일)에 대해 "Edit with Notepad++"
+[HKEY_CLASSES_ROOT\*\shell\Notepad++]
+@="Edit with Notepad++"
+"Icon"="%ProgramFiles%\\Notepad++\\notepad++.exe"
+
+[HKEY_CLASSES_ROOT\*\shell\Notepad++\command]
+@="\"%ProgramFiles%\\Notepad++\\notepad++.exe\" \"%1\""
+
+; ─ 폴더(폴더 우클릭)에서 "Edit with Notepad++" — 폴더 경로를 파일로 열 수 있도록 Explorer에 전달
+[HKEY_CLASSES_ROOT\Directory\shell\Notepad++]
+@="Edit with Notepad++"
+"Icon"="%ProgramFiles%\\Notepad++\\notepad++.exe"
+
+[HKEY_CLASSES_ROOT\Directory\shell\Notepad++\command]
+@="\"%ProgramFiles%\\Notepad++\\notepad++.exe\" \"%1\""
+
+; ─ 폴더 배경(빈 공간) 우클릭 메뉴에 "Open Notepad++ Here" (폴더 경로를 새 탭으로 열기)
+[HKEY_CLASSES_ROOT\Directory\Background\shell\Notepad++]
+@="Open Notepad++ Here"
+"Icon"="%ProgramFiles%\\Notepad++\\notepad++.exe"
+
+[HKEY_CLASSES_ROOT\Directory\Background\shell\Notepad++\command]
+@="\"%ProgramFiles%\\Notepad++\\notepad++.exe\" \"%V\""

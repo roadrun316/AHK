@@ -348,17 +348,35 @@ F23:: Send, ^#!c ; Claunch 호출
 ;F24 Clipboard History 호출
 
 +F15:: Send, {Media_Next}
++F24:: 
+    Send, relic add PAPER_PHROG{Enter}
+    Send, relic add MOLTEN_EGG{Enter}
+    Send, relic add FROZEN_EGG{Enter}
+    Send, relic add TOXIC_EGG{Enter}
+    Send, relic add UNCEASING_TOP{Enter}
+    Send, relic add THE_COURIER{Enter}
+    Send, relic add ICE_CREAM{Enter}
+    Send, relic add VEXING_PUZZLEBOX{Enter}
+    Send, relic add MINIATURE_TENT{Enter}
+    Send, relic add STURDY_CLAMP{Enter}
+    Send, relic add DRAGON_FRUIT{Enter}
+    Send, relic add CHEMICAL_X{Enter}
+    Send, relic add STRIKE_DUMMY{Enter}
+    Send, relic add MINIATURE_CANNON{Enter}
+return
 
 
 ; ===================================================================================================
 ; BROWSER & AI TOOLS (CTRL+ALT+WIN+F Keys)
 ; ===================================================================================================
 ^!#F1:: TOGGLE_TITLE("이쁜부인")
+^!#F2:: 
 ^!#F6:: TOGGLE_EXE("Code.exe", "C:\Users\roadr\AppData\Local\Programs\Microsoft VS Code\Code.exe")
 
 ^!#F7:: TOGGLE_EXE("dopus.exe")
 ^!#F8:: TOGGLE_EXE("Whale.exe", "C:\Users\roadr\AppData\Roaming\Microsoft\Internet Explorer\Quick Launch\User Pinned\TaskBar\네이버 웨일.lnk")
-^!#F9:: TOGGLE_EXE("comet.exe", "C:\Users\roadr\AppData\Local\Perplexity\Comet\Application\comet.exe")
+; ^!#F9:: TOGGLE_EXE("comet.exe", "C:\Users\roadr\AppData\Local\Perplexity\Comet\Application\comet.exe")
+; ^!#F9:: TOGGLE_EXE(
 ^!#F10:: GoAndroidStudio(2)
 ^!#F11:: GoAndroidStudio(1)
 ^!#F12:: GoAndroidStudio(0)
